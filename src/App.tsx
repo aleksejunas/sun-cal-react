@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import "./App.css";
 
 // Define the City type
 type City = {
@@ -44,6 +45,7 @@ const calculateDaylight = (
 
 const App: React.FC = () => {
   const [result, setResult] = useState<string>("");
+  const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
 
   // Define the winter solstice date
   const winterSolsticeYear = 2024;
@@ -66,6 +68,7 @@ const App: React.FC = () => {
       { name: "Stavanger", latitude: 58.9699 },
       { name: "Kristiansand", latitude: 58.0848 },
       { name: "Fredrikstad", latitude: 59.135 },
+      { name: "Longyearbyen", latitude: 78.2166658 },
     ],
     [],
   );
@@ -105,6 +108,11 @@ const App: React.FC = () => {
             2,
           )} hours (${hours} hours and ${minutes} minutes) longer than on the winter solstice.`,
         );
+
+        // Calculate the daylight percentage
+        const maxDaylight = 24.0;
+        const percentage = (currentDaylight / maxDaylight) * 100.0;
+        setDaylightPercentage(percentage);
       }
     };
 
@@ -126,9 +134,9 @@ const App: React.FC = () => {
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4">
       <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+      <div className="bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md">
         <p className="mb-4">
           Current day, date, and time: {now.toLocaleString()}
         </p>
@@ -141,6 +149,12 @@ const App: React.FC = () => {
           ))}
         </ul>
         {result && <p className="mt-4 text-center">{result}</p>}
+        <div className="sun-container mt-4">
+          <div
+            className="sun"
+            style={{ height: `${daylightPercentage}%` }}
+          ></div>
+        </div>
       </div>
     </div>
   );

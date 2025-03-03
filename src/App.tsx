@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 
 // Define the City type
@@ -27,16 +27,12 @@ const calculateDaylight = (
     ((23.45 * Math.PI) / 180.0) *
     Math.sin((2 * Math.PI * (284 + dayOfYear)) / 365);
 
-  // Handle edge cases for polar night and midnight sun
   const tanLatTanDecl = -Math.tan(latRad) * Math.tan(declination);
   if (tanLatTanDecl >= 1.0) {
-    // Polar night: Sun never rises
-    return 0.0;
+    return 0.0; // Polar night
   } else if (tanLatTanDecl <= -1.0) {
-    // Midnight sun: Sun never sets
-    return 24.0;
+    return 24.0; // Midnight sun
   } else {
-    // Normal daylight calculation
     const hourAngle = Math.acos(tanLatTanDecl);
     const daylightHours = (2 * hourAngle * 180) / Math.PI / 15;
     return daylightHours;
@@ -47,18 +43,15 @@ const App: React.FC = () => {
   const [result, setResult] = useState<string>("");
   const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
 
-  // Define the winter solstice date
   const winterSolsticeYear = 2024;
   const winterSolsticeMonth = 12;
   const winterSolsticeDay = 21;
 
-  // Get the current date and time
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
   const currentDay = now.getDate();
 
-  // Memoize the cities array to prevent unnecessary re-renders
   const cities: City[] = useMemo(
     () => [
       { name: "Oslo", latitude: 59.9139 },
@@ -73,65 +66,54 @@ const App: React.FC = () => {
     [],
   );
 
-  // Handle keyboard input
+  const selectCity = useCallback(
+    (index: number) => {
+      const selectedCity = cities[index];
+
+      const winterDaylight = calculateDaylight(
+        winterSolsticeYear,
+        winterSolsticeMonth,
+        winterSolsticeDay,
+        selectedCity.latitude,
+      );
+
+      const currentDaylight = calculateDaylight(
+        currentYear,
+        currentMonth,
+        currentDay,
+        selectedCity.latitude,
+      );
+
+      const daylightDifference = currentDaylight - winterDaylight;
+      const hours = Math.floor(daylightDifference);
+      const minutes = Math.round((daylightDifference - hours) * 60);
+
+      setResult(
+        `In ${selectedCity.name}, the day is ${daylightDifference.toFixed(2)} hours (${hours} hours and ${minutes} minutes) longer than on the winter solstice.`,
+      );
+
+      const maxDaylight = 24.0;
+      const percentage = (currentDaylight / maxDaylight) * 100.0;
+      setDaylightPercentage(percentage);
+    },
+    [cities, currentDay, currentMonth, currentYear],
+  );
+
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       const key = event.key;
       const choice = parseInt(key, 10);
 
       if (choice >= 1 && choice <= cities.length) {
-        const selectedCity = cities[choice - 1];
-
-        // Calculate daylight for winter solstice
-        const winterDaylight = calculateDaylight(
-          winterSolsticeYear,
-          winterSolsticeMonth,
-          winterSolsticeDay,
-          selectedCity.latitude,
-        );
-
-        // Calculate daylight for current date
-        const currentDaylight = calculateDaylight(
-          currentYear,
-          currentMonth,
-          currentDay,
-          selectedCity.latitude,
-        );
-
-        // Calculate the difference
-        const daylightDifference = currentDaylight - winterDaylight;
-        const hours = Math.floor(daylightDifference);
-        const minutes = Math.round((daylightDifference - hours) * 60);
-
-        setResult(
-          `In ${selectedCity.name}, the day is ${daylightDifference.toFixed(
-            2,
-          )} hours (${hours} hours and ${minutes} minutes) longer than on the winter solstice.`,
-        );
-
-        // Calculate the daylight percentage
-        const maxDaylight = 24.0;
-        const percentage = (currentDaylight / maxDaylight) * 100.0;
-        setDaylightPercentage(percentage);
+        selectCity(choice - 1);
       }
     };
 
-    // Add event listener for keypress
     window.addEventListener("keypress", handleKeyPress);
-
-    // Cleanup event listener
     return () => {
       window.removeEventListener("keypress", handleKeyPress);
     };
-  }, [
-    cities,
-    currentDay,
-    currentMonth,
-    currentYear,
-    winterSolsticeDay,
-    winterSolsticeMonth,
-    winterSolsticeYear,
-  ]);
+  }, [cities, selectCity]);
 
   return (
     <div className="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4">
@@ -143,7 +125,11 @@ const App: React.FC = () => {
         <p className="mb-4">Choose a city to see how much longer the day is:</p>
         <ul className="mb-4">
           {cities.map((city, index) => (
-            <li key={index} className="mb-2">
+            <li
+              key={index}
+              className="mb-2 cursor-pointer"
+              onClick={() => selectCity(index)}
+            >
               Press <strong>{index + 1}</strong> for {city.name}
             </li>
           ))}

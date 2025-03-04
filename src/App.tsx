@@ -36,6 +36,10 @@ const App: React.FC = () => {
   const [result, setResult] = useState<string>("");
   const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
   const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
+  const [sunTimes, setSunTimes] = useState<{
+    sunrise: string;
+    sunset: string;
+  } | null>(null);
 
   useEffect(() => {
     const checkTouchDevice = () => {
@@ -66,7 +70,7 @@ const App: React.FC = () => {
   );
 
   const selectCity = useCallback(
-    (index: number) => {
+    async (index: number) => {
       const selectedCity = cities[index];
 
       const winterSolsticeYear = 2024;
@@ -99,6 +103,16 @@ const App: React.FC = () => {
 
       const maxDaylight = 24.0;
       setDaylightPercentage((currentDaylight / maxDaylight) * 100.0);
+
+      // Fetch sunrise and sunset times for the selected city
+      const response = await fetch(
+        `https://api.sunrise-sunset.org/json?lat=${selectedCity.latitude}&lng=0&formatted=0`,
+      );
+      const data = await response.json();
+      setSunTimes({
+        sunrise: new Date(data.results.sunrise).toLocaleTimeString(),
+        sunset: new Date(data.results.sunset).toLocaleTimeString(),
+      });
     },
     [cities, currentDay, currentMonth, currentYear],
   );
@@ -157,6 +171,13 @@ const App: React.FC = () => {
         )}
 
         {result && <p className="mt-4 text-center">{result}</p>}
+
+        {sunTimes && (
+          <div className="mt-4">
+            <p>Sunrise: {sunTimes.sunrise}</p>
+            <p>Sunset: {sunTimes.sunset}</p>
+          </div>
+        )}
 
         <div className="sun-container mt-4">
           <div

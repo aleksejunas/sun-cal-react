@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 
+// TODO: Test the test coverage
+// TODO: Style the app
+// TODO: Try out creating a pull request
+
 type City = {
   name: string;
   latitude: number;

@@ -1,0 +1,299 @@
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import App from "./App";
+
+// Mock fetch for sunrise-sunset API calls
+globalThis.fetch = jest.fn();
+
+const mockFetchResponse = {
+  json: () =>
+    Promise.resolve({
+      results: {
+        sunrise: "2023-05-15T04:30:00+00:00",
+        sunset: "2023-05-15T19:45:00+00:00",
+      },
+      status: "OK",
+    }),
+};
+
+describe("Winter Solstice Calculator", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    (globalThis.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(2023, 4, 15));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks(); // Viktig å resette mocks
+  });
+
+  test("renders app title", () => {
+    render(<App />);
+    const titleElement = screen.getByText(/Winter Solstice Calculator/i);
+    expect(titleElement).toBeInTheDocument();
+  });
+
+  test("displays current date and time", () => {
+    render(<App />);
+    const dateElement = screen.getByTestId("current-date-time");
+    expect(dateElement).toBeInTheDocument();
+    expect(dateElement.textContent).toContain("Current day, date, and time:");
+  });
+
+  test("renders city selection options", () => {
+    render(<App />);
+    expect(
+      screen.getByText(/Choose a city to see how much longer the day is:/i),
+    ).toBeInTheDocument();
+
+    // Check that Oslo is in the list (testing just one city as example)
+    expect(screen.getByText(/Oslo/i)).toBeInTheDocument();
+  });
+
+  test("handles city selection on non-touch devices", async () => {
+    // Mock navigator to simulate a non-touch device
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 0,
+      configurable: true,
+    });
+
+    render(<App />);
+
+    // Check that keyboard instructions are shown
+    expect(screen.getByText(/Press/i)).toBeInTheDocument();
+
+    // Simulate clicking on a city
+    fireEvent.click(screen.getByText(/Oslo/i));
+
+    // Check API was called
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("api.sunrise-sunset.org/json?lat=59.9139"),
+    );
+
+    // Wait for results to display
+    await waitFor(() => {
+      expect(screen.getByText(/In Oslo, the day is/i)).toBeInTheDocument();
+    });
+
+    // Check that sunrise and sunset times are displayed
+    await waitFor(() => {
+      expect(screen.getByText(/Sunrise:/i)).toBeInTheDocument();
+      expect(screen.getByText(/Sunset:/i)).toBeInTheDocument();
+    });
+  });
+
+  test("handles city selection via keyboard shortcuts", async () => {
+    // Mock navigator to simulate a non-touch device
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 0,
+      configurable: true,
+    });
+
+    render(<App />);
+
+    // Simulate pressing "1" key (for Oslo)
+    fireEvent.keyPress(window, { key: "1" });
+
+    // Check API was called
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("api.sunrise-sunset.org/json?lat=59.9139"),
+    );
+
+    // Wait for results to display
+    await waitFor(() => {
+      expect(screen.getByText(/In Oslo, the day is/i)).toBeInTheDocument();
+    });
+  });
+
+  test("renders buttons on touch devices", () => {
+    // Mock navigator to simulate a touch device
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 1,
+      configurable: true,
+    });
+
+    render(<App />);
+
+    // Check that buttons are shown instead of keyboard instructions
+    const buttons = screen.getAllByRole("button");
+    expect(buttons.length).toBeGreaterThan(0);
+
+    // Check that Oslo button exists
+    expect(screen.getByRole("button", { name: /Oslo/i })).toBeInTheDocument();
+  });
+
+  test("handles city selection via touch button", async () => {
+    // Mock navigator to simulate a touch device
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 1,
+      configurable: true,
+    });
+
+    render(<App />);
+
+    // Click on Oslo button
+    fireEvent.click(screen.getByRole("button", { name: /Oslo/i }));
+
+    // Check API was called
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("api.sunrise-sunset.org/json?lat=59.9139"),
+    );
+
+    // Wait for results to display
+    await waitFor(() => {
+      expect(screen.getByText(/In Oslo, the day is/i)).toBeInTheDocument();
+    });
+  });
+
+  test("handles API errors gracefully", async () => {
+    // Mock a failed API response
+    (globalThis.fetch as jest.Mock).mockRejectedValueOnce(
+      new Error("API failure"),
+    );
+
+    // Mock navigator to simulate a non-touch device
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 0,
+      configurable: true,
+    });
+
+    render(<App />);
+
+    // Simulate clicking on a city
+    fireEvent.click(screen.getByText(/Oslo/i));
+
+    // Despite the API error, the daylight calculation should still work
+    await waitFor(() => {
+      expect(screen.getByText(/In Oslo, the day is/i)).toBeInTheDocument();
+    });
+
+    // But sunrise/sunset info should not be displayed
+    expect(screen.queryByText(/Sunrise:/i)).not.toBeInTheDocument();
+  });
+
+  test("calculates daylight correctly", async () => {
+    // Mock navigator to simulate a non-touch device
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 0,
+      configurable: true,
+    });
+
+    render(<App />);
+
+    // Select Oslo
+    fireEvent.click(screen.getByText(/Oslo/i));
+
+    // Check that the calculation is performed and displayed
+    await waitFor(() => {
+      const resultText = screen.getByText(/In Oslo, the day is/i);
+      expect(resultText).toBeInTheDocument();
+      // We don't check the exact values since they depend on the current date
+      // and the calculation logic, which is tested separately
+    });
+
+    // Check that the sun visualization is updated
+    const sunElement = document.querySelector(".sun");
+    expect(sunElement).toBeInTheDocument();
+    expect(sunElement).toHaveStyle({ height: expect.stringContaining("%") });
+  });
+
+  test("sun visualization updates based on daylight percentage", async () => {
+    // Mock navigator to simulate a non-touch device
+    Object.defineProperty(window.navigator, "maxTouchPoints", {
+      value: 0,
+      configurable: true,
+    });
+
+    render(<App />);
+
+    // Select two different cities to compare
+
+    // First, select Oslo
+    fireEvent.click(screen.getByText(/Oslo/i));
+
+    await waitFor(() => {
+      expect(screen.getByText(/In Oslo, the day is/i)).toBeInTheDocument();
+    });
+
+    const osloSunHeight = document.querySelector(".sun")?.getAttribute("style");
+
+    // Then select Tromsø (which should have different daylight)
+    fireEvent.click(screen.getByText(/Tromsø/i));
+
+    await waitFor(() => {
+      expect(screen.getByText(/In Tromsø, the day is/i)).toBeInTheDocument();
+    });
+
+    const tromsoSunHeight = document
+      .querySelector(".sun")
+      ?.getAttribute("style");
+
+    // The heights should be different due to different latitudes
+    // We're not checking exact values, just that they differ
+    expect(osloSunHeight).not.toBe(tromsoSunHeight);
+  });
+});
+
+// Unit test for the calculateDaylight function
+describe("calculateDaylight function", () => {
+  // We need to extract the function for testing
+  // Since it's not exported from App.tsx, we'll recreate it here for testing
+
+  const calculateDaylight = (
+    year: number,
+    month: number,
+    day: number,
+    latitude: number,
+  ): number => {
+    const latRad = (latitude * Math.PI) / 180.0;
+    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
+      daysInMonth[1] = 29;
+    }
+    let dayOfYear = day;
+    for (let i = 0; i < month - 1; i++) {
+      dayOfYear += daysInMonth[i];
+    }
+    const declination =
+      ((23.45 * Math.PI) / 180.0) *
+      Math.sin((2 * Math.PI * (284 + dayOfYear)) / 365);
+
+    const tanLatTanDecl = -Math.tan(latRad) * Math.tan(declination);
+    if (tanLatTanDecl >= 1.0) return 0.0;
+    if (tanLatTanDecl <= -1.0) return 24.0;
+    const hourAngle = Math.acos(tanLatTanDecl);
+    return (2 * hourAngle * 180) / Math.PI / 15;
+  };
+
+  test("returns 24 hours for polar day", () => {
+    // Midsummer at North Pole
+    const daylight = calculateDaylight(2023, 6, 21, 90);
+    expect(daylight).toBe(24.0);
+  });
+
+  test("returns 0 hours for polar night", () => {
+    // Winter solstice at South Pole
+    const daylight = calculateDaylight(2023, 12, 21, -90);
+    expect(daylight).toBe(0.0);
+  });
+
+  test("returns approximately 12 hours at equator during equinox", () => {
+    // Spring equinox at equator
+    const daylight = calculateDaylight(2023, 3, 20, 0);
+    expect(daylight).toBeCloseTo(12.0, 1);
+  });
+
+  test("handles leap year correctly", () => {
+    // February 29 in leap year
+    const leapYearDaylight = calculateDaylight(2024, 2, 29, 45);
+    // February 28 in non-leap year
+    const nonLeapYearDaylight = calculateDaylight(2023, 2, 28, 45);
+
+    // They should be close but not exactly the same
+    expect(leapYearDaylight).not.toBe(nonLeapYearDaylight);
+  });
+});
+

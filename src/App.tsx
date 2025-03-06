@@ -2,7 +2,16 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 
 // TODO: Test the test coverage
-// TODO: Style the app
+
+// -- STYLING --
+// TODO: Style the app like the box for the moon moon boxes box HA HA!
+// TODO: Make a nice css animation for the sun
+
+// Nice Colors to use: #87CEEB, #FFA500, #FF4500, #FFB6C1, #191970, #FDFD96, #D3D3D3
+// Change the background color on differten times of the day
+// And of course the color palette from the moon boxes box
+
+// -- Commiting --
 // TODO: Try out creating a pull request
 
 type City = {
@@ -10,7 +19,7 @@ type City = {
   latitude: number;
 };
 
-const calculateDaylight = (
+export const calculateDaylight = (
   year: number,
   month: number,
   day: number,
@@ -38,7 +47,7 @@ const calculateDaylight = (
 
 const App: React.FC = () => {
   const [result, setResult] = useState<string>("");
-  const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
+  // const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
   const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
   const [sunTimes, setSunTimes] = useState<{
     sunrise: string;
@@ -54,10 +63,10 @@ const App: React.FC = () => {
     checkTouchDevice();
   }, []);
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-  const currentDay = now.getDate();
+  // const now = new Date();
+  // const currentYear = now.getFullYear();
+  // const currentMonth = now.getMonth() + 1;
+  // const currentDay = now.getDate();
 
   const cities: City[] = useMemo(
     () => [
@@ -72,6 +81,8 @@ const App: React.FC = () => {
     ],
     [],
   );
+
+  const now = useMemo(() => new Date(), []);
 
   const selectCity = useCallback(
     async (index: number) => {
@@ -88,6 +99,10 @@ const App: React.FC = () => {
         selectedCity.latitude,
       );
 
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      const currentDay = now.getDate();
+
       const currentDaylight = calculateDaylight(
         currentYear,
         currentMonth,
@@ -102,23 +117,27 @@ const App: React.FC = () => {
       setResult(
         `In ${selectedCity.name}, the day is ${daylightDifference.toFixed(
           2,
-        )} hours (${hours} hours and ${minutes} minutes) longer than on the winter solstice.`,
+        )} hours (${hours} hours and ${minutes} minutes) longer.`,
       );
 
-      const maxDaylight = 24.0;
-      setDaylightPercentage((currentDaylight / maxDaylight) * 100.0);
+      try {
+        const response = await fetch(
+          `https://api.sunrise-sunset.org/json?lat=${selectedCity.latitude}&lng=0&formatted=0`,
+        );
+        if (!response.ok) throw new Error("API Error");
 
-      // Fetch sunrise and sunset times for the selected city
-      const response = await fetch(
-        `https://api.sunrise-sunset.org/json?lat=${selectedCity.latitude}&lng=0&formatted=0`,
-      );
-      const data = await response.json();
-      setSunTimes({
-        sunrise: new Date(data.results.sunrise).toLocaleTimeString(),
-        sunset: new Date(data.results.sunset).toLocaleTimeString(),
-      });
+        const data = await response.json();
+
+        setSunTimes({
+          sunrise: new Date(data.results.sunrise).toLocaleTimeString(),
+          sunset: new Date(data.results.sunset).toLocaleTimeString(),
+        });
+      } catch (error) {
+        console.error(error);
+        setSunTimes(null);
+      }
     },
-    [cities, currentDay, currentMonth, currentYear],
+    [cities, now],
   );
 
   useEffect(() => {
@@ -141,7 +160,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4">
       <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
       <div className="bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md">
-        <p className="mb-4">
+        <p className="mb-4" data-testid="current-date-time">
           Current day, date, and time: {now.toLocaleString()}
         </p>
         <p className="mb-4">Choose a city to see how much longer the day is:</p>
@@ -186,7 +205,7 @@ const App: React.FC = () => {
         <div className="sun-container mt-4">
           <div
             className="sun"
-            style={{ height: `${daylightPercentage}%` }}
+            // style={{ height: `${daylightPercentage}%` }}
           ></div>
         </div>
       </div>

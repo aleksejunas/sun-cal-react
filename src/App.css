@@ -1,5 +1,5 @@
 .sun-container {
-  width: 100;
+  width: 100px;
   height: 100px;
   border-radius: 50%;
   background-color: #ffcc00;
@@ -7,10 +7,12 @@
   position: relative;
   display: flex;
   justify-content: center;
+  align-items: flex-end;
 }
 
-.sun {
+.sun-light {
   width: 100%;
+  height: 0%;
   background-color: #ff9900;
   transition: height 1s ease-in-out;
   border-radius: 50%;

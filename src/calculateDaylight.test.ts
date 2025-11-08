@@ -1,4 +1,4 @@
-import { calculateDaylight } from "./App"; // You'll need to export this function
+import { calculateDaylight } from "./utils/calculateDaylight";
 
 describe("calculateDaylight", () => {
   test("calculates daylight hours correctly", () => {

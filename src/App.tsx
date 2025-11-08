@@ -1,51 +1,34 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
-
-// TODO: Test the test coverage
+import { calculateDaylight } from "./utils/calculateDaylight";
 
 // -- STYLING --
 // TODO: Style the app like the box for the moon moon boxes box HA HA!
 // TODO: Make a nice css animation for the sun
 
 // Nice Colors to use: #87CEEB, #FFA500, #FF4500, #FFB6C1, #191970, #FDFD96, #D3D3D3
-// Change the background color on differten times of the day
+// Change the background color on differtent times of the day
 // And of course the color palette from the moon boxes box
 
 // -- Commiting --
-// TODO: Try out creating a pull request
-
+// TODO: Lage en counter som teller ned til vintersolverv med dager, timer, minutter og sekunder
 type City = {
   name: string;
   latitude: number;
 };
 
-export const calculateDaylight = (
-  year: number,
-  month: number,
-  day: number,
-  latitude: number,
-): number => {
-  const latRad = (latitude * Math.PI) / 180.0;
-  const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
-    daysInMonth[1] = 29;
-  }
-  let dayOfYear = day;
-  for (let i = 0; i < month - 1; i++) {
-    dayOfYear += daysInMonth[i];
-  }
-  const declination =
-    ((23.45 * Math.PI) / 180.0) *
-    Math.sin((2 * Math.PI * (284 + dayOfYear)) / 365);
-
-  const tanLatTanDecl = -Math.tan(latRad) * Math.tan(declination);
-  if (tanLatTanDecl >= 1.0) return 0.0;
-  if (tanLatTanDecl <= -1.0) return 24.0;
-  const hourAngle = Math.acos(tanLatTanDecl);
-  return (2 * hourAngle * 180) / Math.PI / 15;
-};
-
 const App: React.FC = () => {
+  const [lightHeight, setLightHeight] = useState<number>(() => {
+    const now = new Date();
+    const longestDay = new Date(now.getFullYear(), 5, 21); // June 21st
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const totalDays =
+      (longestDay.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+    const currentDays =
+      (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+    return Math.min((currentDays / totalDays) * 100, 100);
+  });
+
   const [result, setResult] = useState<string>("");
   // const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
   const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
@@ -53,6 +36,22 @@ const App: React.FC = () => {
     sunrise: string;
     sunset: string;
   } | null>(null);
+
+  useEffect(() => {
+    const calculateLightHeight = () => {
+      const now = new Date();
+      const longestDay = new Date(now.getFullYear(), 5, 21); // June 21st
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const totalDays =
+        (longestDay.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+      const currentDays =
+        (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+      const percentage = Math.min((currentDays / totalDays) * 100, 100);
+      setLightHeight(percentage);
+    };
+
+    calculateLightHeight();
+  }, []);
 
   useEffect(() => {
     const checkTouchDevice = () => {
@@ -159,7 +158,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4">
       <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
-      <div className="bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md">
+      <div className="bg-blue-300 p-6 rounded-lg shadow-md w-full max-w-md">
         <p className="mb-4" data-testid="current-date-time">
           Current day, date, and time: {now.toLocaleString()}
         </p>
@@ -171,7 +170,7 @@ const App: React.FC = () => {
             {cities.map((city, index) => (
               <button
                 key={index}
-                className="bg-blue-500 text-white p-2 rounded-md text-center"
+                className="bg-yellow-300 text-white p-2 rounded-md text-center"
                 onClick={() => selectCity(index)}
               >
                 {city.name}
@@ -204,8 +203,8 @@ const App: React.FC = () => {
 
         <div className="sun-container mt-4">
           <div
-            className="sun"
-            // style={{ height: `${daylightPercentage}%` }}
+            className="sun-light"
+            style={{ height: `${lightHeight}%` }}
           ></div>
         </div>
       </div>

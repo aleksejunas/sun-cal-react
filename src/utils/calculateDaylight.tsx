@@ -1,4 +1,17 @@
-export const calculateDaylight = (
+/**
+ * Calculates the number of daylight hours for a given date and latitude
+ *
+ * Uses astronomical formulas to estimate the length of the day (in hours)
+ * based on Earth's axial tilt and postion in orbit.
+ *
+ * @param {number} year - The year (e.g. 2024)
+ * @param {number} month - The month (1-12)
+ * @param {number} day - The day of the month (1-31)
+ * @param {number} latitude - The latitude in degrees (positive for north, negative for south)
+ * @returns {number} The number of daylight hours for the specified date and latitude
+ */
+
+const calculateDaylight = (
   year: number,
   month: number,
   day: number,
@@ -23,3 +36,5 @@ export const calculateDaylight = (
   const hourAngle = Math.acos(tanLatTanDecl);
   return (2 * hourAngle * 180) / Math.PI / 15;
 };
+
+export default calculateDaylight;

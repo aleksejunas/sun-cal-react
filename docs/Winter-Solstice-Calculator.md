@@ -78,6 +78,6 @@ The Winter Solstice Calculator is a web application that compares the current da
 
 1. Clone the repository
 2. Navigate to the project directory
-3. Run `npm install` to install dependencies
-4. Run `npm start` to launch the development server
+3. Run `pnpm install` to install dependencies
+4. Run `pnpm start` to launch the development server
 5. Access the app at `http://localhost:3000`

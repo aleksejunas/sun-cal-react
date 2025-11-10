@@ -18,6 +18,62 @@ type City = {
 };
 
 const App: React.FC = () => {
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  // Update current time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Countdown timer state
+  const [countdown, setCountdown] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  }>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 9,
+  });
+
+  // Countdown timer effect
+  useEffect(() => {
+    /** Countdown timer effect
+     * Updates the countdown timer to the next winter solstice.
+     * Calculates days, hours, minutes, and seconds remaining.
+     */
+
+    const updateCountdown = () => {
+      const nowTime = new Date();
+      const winterSolstice = new Date(nowTime.getFullYear(), 11, 21, 0, 0, 0);
+      let target = winterSolstice;
+      if (nowTime > winterSolstice) {
+        target = new Date(nowTime.getFullYear() + 1, 11, 21, 0, 0, 0);
+      }
+      const diff = target.getTime() - nowTime.getTime();
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      setCountdown({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  /** Light height calculation
+   * Calculates the percentage of days passed from the start of the year
+   * to the summer solstice (June 21st), representing the "height" of daylight.
+   * @returns {number} Percentage (0 - 100) of days passed to solstice
+   */
+
   const [lightHeight, setLightHeight] = useState<number>(() => {
     const now = new Date();
     const longestDay = new Date(now.getFullYear(), 5, 21); // June 21st
@@ -29,15 +85,12 @@ const App: React.FC = () => {
     return Math.min((currentDays / totalDays) * 100, 100);
   });
 
-  const [result, setResult] = useState<string>("");
-  // const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
-  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
-  const [sunTimes, setSunTimes] = useState<{
-    sunrise: string;
-    sunset: string;
-  } | null>(null);
-
   useEffect(() => {
+    /**
+     * Updates the lightHeight state to reflect the current percentage of days
+     * passed from the start of the year to the summer solstice
+     */
+
     const calculateLightHeight = () => {
       const now = new Date();
       const longestDay = new Date(now.getFullYear(), 5, 21); // June 21st
@@ -53,6 +106,14 @@ const App: React.FC = () => {
     calculateLightHeight();
   }, []);
 
+  const [result, setResult] = useState<string>("");
+  // const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
+  const [sunTimes, setSunTimes] = useState<{
+    sunrise: string;
+    sunset: string;
+  } | null>(null);
+
   useEffect(() => {
     const checkTouchDevice = () => {
       setIsTouchDevice(
@@ -61,11 +122,6 @@ const App: React.FC = () => {
     };
     checkTouchDevice();
   }, []);
-
-  // const now = new Date();
-  // const currentYear = now.getFullYear();
-  // const currentMonth = now.getMonth() + 1;
-  // const currentDay = now.getDate();
 
   const cities: City[] = useMemo(
     () => [
@@ -81,7 +137,13 @@ const App: React.FC = () => {
     [],
   );
 
-  const now = useMemo(() => new Date(), []);
+  // const now = useMemo(() => new Date(), []);
+
+  /**
+   * Handles city selection, calculates daylight difference from winter solstice,
+   * fetches sunrise/sunset times, and updates result state.
+   * @param {number} index - Index of the selected city in the cities array.
+   */
 
   const selectCity = useCallback(
     async (index: number) => {
@@ -98,9 +160,9 @@ const App: React.FC = () => {
         selectedCity.latitude,
       );
 
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth() + 1;
-      const currentDay = now.getDate();
+      const currentYear = currentTime.getFullYear();
+      const currentMonth = currentTime.getMonth() + 1;
+      const currentDay = currentTime.getDate();
 
       const currentDaylight = calculateDaylight(
         currentYear,
@@ -136,7 +198,7 @@ const App: React.FC = () => {
         setSunTimes(null);
       }
     },
-    [cities, now],
+    [cities, currentTime],
   );
 
   useEffect(() => {
@@ -160,10 +222,9 @@ const App: React.FC = () => {
       <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
       <div className="bg-blue-300 p-6 rounded-lg shadow-md w-full max-w-md">
         <p className="mb-4" data-testid="current-date-time">
-          Current day, date, and time: {now.toLocaleString()}
+          Current day, date, and time: {currentTime.toLocaleString()}
         </p>
         <p className="mb-4">Choose a city to see how much longer the day is:</p>
-
         {isTouchDevice ? (
           // Render buttons for touchscreen devices
           <div className="grid grid-cols-2 gap-2">
@@ -191,16 +252,18 @@ const App: React.FC = () => {
             ))}
           </ul>
         )}
-
         {result && <p className="mt-4 text-center">{result}</p>}
-
         {sunTimes && (
           <div className="mt-4">
             <p>Sunrise: {sunTimes.sunrise}</p>
             <p>Sunset: {sunTimes.sunset}</p>
           </div>
         )}
-
+        Countdown to Winter Solstice:{" "}
+        <span data-testid="solstice-countdown">
+          {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
+          {countdown.seconds}s
+        </span>
         <div className="sun-container mt-4">
           <div
             className="sun-light"
@@ -213,3 +276,8 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+// const now = new Date();
+// const currentYear = now.getFullYear();
+// const currentMonth = now.getMonth() + 1;
+// const currentDay = now.getDate();

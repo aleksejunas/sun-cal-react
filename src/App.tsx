@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
-import { calculateDaylight } from "./utils/calculateDaylight";
+import calculateDaylight from "./utils/calculateDaylight";
+import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
 
 // -- STYLING --
 // TODO: Style the app like the box for the moon moon boxes box HA HA!
@@ -160,6 +161,13 @@ const App: React.FC = () => {
         selectedCity.latitude,
       );
 
+      const winterDaylightPrecise = calculateDaylightPrecise(
+        winterSolsticeYear,
+        winterSolsticeMonth,
+        winterSolsticeDay,
+        selectedCity.latitude,
+      );
+
       const currentYear = currentTime.getFullYear();
       const currentMonth = currentTime.getMonth() + 1;
       const currentDay = currentTime.getDate();
@@ -171,15 +179,38 @@ const App: React.FC = () => {
         selectedCity.latitude,
       );
 
+      const currentDaylightPrecise = calculateDaylightPrecise(
+        currentYear,
+        currentMonth,
+        currentDay,
+        selectedCity.latitude,
+      );
+
+      // const currentDaylightPrecise = calculateDaylightPrecise(currentYear);
+
       const daylightDifference = currentDaylight - winterDaylight;
+      const daylightDifferencePrecise =
+        currentDaylightPrecise - winterDaylightPrecise;
+
       const hours = Math.floor(daylightDifference);
       const minutes = Math.round((daylightDifference - hours) * 60);
 
-      setResult(
-        `In ${selectedCity.name}, the day is ${daylightDifference.toFixed(
-          2,
-        )} hours (${hours} hours and ${minutes} minutes) longer.`,
+      const hoursPrecise = Math.floor(daylightDifferencePrecise);
+      const minutesPrecise = Math.round(
+        (daylightDifferencePrecise - hoursPrecise) * 60,
       );
+
+      setResult(
+        `In ${selectedCity.name}, the day is:\n` +
+          `- Approximate: ${daylightDifference.toFixed(2)} hours (${hours}h ${minutes}m) longer\n` +
+          ` - Precise (NOAA: ${daylightDifference.toFixed(2)} hours(${hoursPrecise}h ${minutesPrecise}m) longer.`,
+      );
+
+      // setResult(
+      //   `In ${selectedCity.name}, the day is ${daylightDifference.toFixed(
+      //     2,
+      //   )} hours (${hours} hours and ${minutes} minutes) longer.`,
+      // );
 
       try {
         const response = await fetch(
@@ -218,7 +249,7 @@ const App: React.FC = () => {
   }, [cities, selectCity, isTouchDevice]);
 
   return (
-    <div className="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4">
+    <div className=" w-full bg-gray-700 flex flex-col items-center justify-center p-4">
       <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
       <div className="bg-blue-300 p-6 rounded-lg shadow-md w-full max-w-md">
         <p className="mb-4" data-testid="current-date-time">
@@ -274,10 +305,4 @@ const App: React.FC = () => {
     </div>
   );
 };
-
 export default App;
-
-// const now = new Date();
-// const currentYear = now.getFullYear();
-// const currentMonth = now.getMonth() + 1;
-// const currentDay = now.getDate();

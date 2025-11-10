@@ -1,21 +1,98 @@
-.sun-container {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background-color: #ffcc00;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
+/* .sun-container { */
+/*   width: 100px; */
+/*   height: 100px; */
+/*   border-radius: 50%; */
+/*   background-color: #ffcc00; */
+/*   overflow: hidden; */
+/*   position: relative; */
+/*   display: flex; */
+/*   justify-content: center; */
+/*   align-items: flex-end; */
+/* } */
+/**/
+/* .sun-light { */
+/*   width: 100%; */
+/*   height: 0%; */
+/*   background-color: #ff9900; */
+/*   transition: height 1s ease-in-out; */
+/*   border-radius: 50%; */
+/* } */
+
+/* filepath: src/App.css */
+/* Gradient background for time of day */
+body,
+.main-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #191970 0%, #87ceeb 100%);
+  transition: background 1s;
 }
 
+/* Centered card */
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  max-width: 400px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+/* Headings */
+h1 {
+  font-size: 2.5rem;
+  color: #ff4500;
+  margin-bottom: 1rem;
+}
+
+/* City buttons */
+.city-btn {
+  background: linear-gradient(90deg, #ffa500 60%, #ffb6c1 100%);
+  color: #fff;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.75rem 1.5rem;
+  margin: 0.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.city-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px #ffb6c1;
+}
+
+/* Countdown box */
+.countdown {
+  background: #fdfd96;
+  color: #191970;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* Sun animation */
+.sun-container {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffcc00 70%, #ff9900 100%);
+  box-shadow: 0 0 40px 10px #ffcc00;
+  margin: 2rem auto;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: visible;
+}
 .sun-light {
   width: 100%;
   height: 0%;
-  background-color: #ff9900;
-  transition: height 1s ease-in-out;
+  background: linear-gradient(180deg, #ff9900 0%, #ffcc00 100%);
   border-radius: 50%;
+  transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* #root { */

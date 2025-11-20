@@ -10,6 +10,20 @@ type DaylightPreciseResult = {
   sunset: string;
 };
 
+// Nice Colors to use: #87CEEB, #FFA500, #FF4500, #FFB6C1, #191970, #FDFD96, #D3D3D3
+// Change the background color on differtent times of the day
+// And of course the color palette from the moon boxes box
+
+// -- Commiting --
+// TODO: Legge til precise calculation og for soloppgang og solnedgang
+
+// Type for precise calculation result
+// type DaylightPreciseResult = {
+//   daylightHours: number;
+//   sunrise: string;
+//   sunset: string;
+// };
+
 type City = {
   name: string;
   latitude: number;
@@ -183,6 +197,8 @@ const App: React.FC = () => {
           `- Precise (NOAA): ${daylightDifferencePrecise.toFixed(
             2,
           )} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
+          `- Approximate: ${daylightDifference.toFixed(2)} hours (${hours}h ${minutes}m) longer\n` +
+          `- Precise (NOAA): ${daylightDifferencePrecise.toFixed(2)} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
           `- Sunrise (Precise): ${currentDaylightPrecise.sunrise}\n` +
           `- Sunset (Precise): ${currentDaylightPrecise.sunset}`,
       );
@@ -227,62 +243,66 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4">
-      <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
-      <div className="bg-blue-300 p-6 rounded-lg shadow-md w-full max-w-md">
-        <p className="mb-4" data-testid="current-date-time">
-          Current day, date, and time: {currentTime.toLocaleString()}
-        </p>
-        <p className="mb-4">Choose a city to see how much longer the day is:</p>
-        {isTouchDevice ? (
-          <div className="grid grid-cols-2 gap-2">
-            {cities.map((city, index) => (
-              <button
-                key={index}
-                className="bg-yellow-300 text-white p-2 rounded-md text-center"
-                onClick={() => selectCity(index)}
-              >
-                {city.name}
-              </button>
-            ))}
+      <div className="w-full bg-gray-700 flex flex-col items-center justify-center p-4">
+        <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
+        <div className="bg-blue-300 p-6 rounded-lg shadow-md w-full max-w-md">
+          <p className="mb-4" data-testid="current-date-time">
+            Current day, date, and time: {currentTime.toLocaleString()}
+          </p>
+          <p className="mb-4">
+            Choose a city to see how much longer the day is:
+          </p>
+          {isTouchDevice ? (
+            <div className="grid grid-cols-2 gap-2">
+              {cities.map((city, index) => (
+                <button
+                  key={index}
+                  className="bg-yellow-300 text-white p-2 rounded-md text-center"
+                  onClick={() => selectCity(index)}
+                >
+                  {city.name}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <ul className="mb-4">
+              {cities.map((city, index) => (
+                <li
+                  key={index}
+                  className="mb-2 cursor-pointer"
+                  onClick={() => selectCity(index)}
+                >
+                  Press <strong>{index + 1}</strong> for {city.name}
+                </li>
+              ))}
+            </ul>
+          )}
+          {result && (
+            <div className="mt-4 text-center">
+              {result.split("\n").map((line, idx) => (
+                <div key={idx}>{line}</div>
+              ))}
+            </div>
+          )}
+          {sunTimes && preciseTimes && (
+            <div className="mt-4">
+              <p>Sunrise (API): {sunTimes.sunrise}</p>
+              <p>Sunrise (Precise): {preciseTimes.sunrise}</p>
+              <p>Sunset (API): {sunTimes.sunset}</p>
+              <p>Sunset (Precise): {preciseTimes.sunset}</p>
+            </div>
+          )}
+          Countdown to Winter Solstice:{" "}
+          <span data-testid="solstice-countdown">
+            {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
+            {countdown.seconds}s
+          </span>
+          <div className="sun-container mt-4">
+            <div
+              className="sun-light"
+              style={{ height: `${lightHeight}%` }}
+            ></div>
           </div>
-        ) : (
-          <ul className="mb-4">
-            {cities.map((city, index) => (
-              <li
-                key={index}
-                className="mb-2 cursor-pointer"
-                onClick={() => selectCity(index)}
-              >
-                Press <strong>{index + 1}</strong> for {city.name}
-              </li>
-            ))}
-          </ul>
-        )}
-        {result && (
-          <div className="mt-4 text-center">
-            {result.split("\n").map((line, idx) => (
-              <div key={idx}>{line}</div>
-            ))}
-          </div>
-        )}
-        {sunTimes && preciseTimes && (
-          <div className="mt-4">
-            <p>Sunrise (API): {sunTimes.sunrise}</p>
-            <p>Sunrise (Precise): {preciseTimes.sunrise}</p>
-            <p>Sunset (API): {sunTimes.sunset}</p>
-            <p>Sunset (Precise): {preciseTimes.sunset}</p>
-          </div>
-        )}
-        Countdown to Winter Solstice:{" "}
-        <span data-testid="solstice-countdown">
-          {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
-          {countdown.seconds}s
-        </span>
-        <div className="sun-container mt-4">
-          <div
-            className="sun-light"
-            style={{ height: `${lightHeight}%` }}
-          ></div>
         </div>
       </div>
     </div>

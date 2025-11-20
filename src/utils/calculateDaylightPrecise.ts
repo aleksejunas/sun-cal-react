@@ -39,18 +39,42 @@ const calculateDaylightPrecise = (
 
   const cosH = -Math.tan(latRad) * Math.tan(decl);
   let daylightHours = 0;
-  if (cosH >= 1) daylightHours = 0;
-  else if (cosH <= -1) daylightHours = 24;
-  else {
+  if (cosH >= 1) {
+    daylightHours = 0;
+  } else if (cosH <= -1) {
+    daylightHours = 24;
+  } else {
     const H = Math.acos(cosH);
     daylightHours = (2 * H * 180) / Math.PI / 15;
   }
 
-  // Placeholder for sunrise/sunset
+  const clampHours = (value: number) => {
+    if (value < 0) return 0;
+    if (value > 24) return 24;
+    return value;
+  };
+
+  const formatTime = (hours: number) => {
+    const clamped = clampHours(hours);
+    let wholeHours = Math.floor(clamped);
+    let minutes = Math.round((clamped - wholeHours) * 60);
+
+    if (minutes === 60) {
+      wholeHours += 1;
+      minutes = 0;
+    }
+
+    const pad = (value: number) => value.toString().padStart(2, "0");
+    return `${pad(wholeHours % 24)}:${pad(minutes)}`;
+  };
+
+  const sunriseHours = 12 - daylightHours / 2;
+  const sunsetHours = 12 + daylightHours / 2;
+
   return {
     daylightHours,
-    sunrise: "",
-    sunset: "",
+    sunrise: formatTime(sunriseHours),
+    sunset: formatTime(sunsetHours),
   };
 };
 

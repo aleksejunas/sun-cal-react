@@ -1,10 +1,8 @@
-// filepath: src/App.tsx;
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 import calculateDaylight from "./utils/calculateDaylight";
 import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
 
-// Type for precise calculation result
 type DaylightPreciseResult = {
   daylightHours: number;
   sunrise: string;
@@ -16,47 +14,51 @@ type City = {
   latitude: number;
 };
 
+type SunTimes = {
+  sunrise: string;
+  sunset: string;
+};
+
 const App: React.FC = () => {
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [currentTime, setCurrentTime] = useState(new Date());
   const [preciseTimes, setPreciseTimes] =
     useState<DaylightPreciseResult | null>(null);
-
-  // Update current time every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Countdown timer state
-  const [countdown, setCountdown] = useState<{
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
-  }>({
+  const [countdown, setCountdown] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 9,
   });
+  const [lightHeight, setLightHeight] = useState(() => {
+    const now = new Date();
+    const longest = new Date(now.getFullYear(), 5, 21);
+    const start = new Date(now.getFullYear(), 0, 1);
+    const total = (longest.getTime() - start.getTime()) / 86400000;
+    const current = (now.getTime() - start.getTime()) / 86400000;
+    return Math.min((current / total) * 100, 100);
+  });
+  const [result, setResult] = useState("");
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [sunTimes, setSunTimes] = useState<SunTimes | null>(null);
 
-  // Countdown timer effect
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const updateCountdown = () => {
-      const nowTime = new Date();
-      const winterSolstice = new Date(nowTime.getFullYear(), 11, 21, 0, 0, 0);
-      let target = winterSolstice;
-      if (nowTime > winterSolstice) {
-        target = new Date(nowTime.getFullYear() + 1, 11, 21, 0, 0, 0);
-      }
-      const diff = target.getTime() - nowTime.getTime();
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      setCountdown({ days, hours, minutes, seconds });
+      const now = new Date();
+      const solstice = new Date(now.getFullYear(), 11, 21, 0, 0, 0);
+      const target =
+        now > solstice ? new Date(now.getFullYear() + 1, 11, 21) : solstice;
+      const diff = target.getTime() - now.getTime();
+      setCountdown({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
     };
 
     updateCountdown();
@@ -64,51 +66,24 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Light height percentage (year progress to summer solstice)
-  const [lightHeight, setLightHeight] = useState<number>(() => {
-    const now = new Date();
-    const longestDay = new Date(now.getFullYear(), 5, 21);
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const totalDays =
-      (longestDay.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
-    const currentDays =
-      (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
-    return Math.min((currentDays / totalDays) * 100, 100);
-  });
-
   useEffect(() => {
-    const calculateLightHeight = () => {
+    const updateLightHeight = () => {
       const now = new Date();
-      const longestDay = new Date(now.getFullYear(), 5, 21);
-      const startOfYear = new Date(now.getFullYear(), 0, 1);
-      const totalDays =
-        (longestDay.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
-      const currentDays =
-        (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
-      const percentage = Math.min((currentDays / totalDays) * 100, 100);
-      setLightHeight(percentage);
+      const longest = new Date(now.getFullYear(), 5, 21);
+      const start = new Date(now.getFullYear(), 0, 1);
+      const total = (longest.getTime() - start.getTime()) / 86400000;
+      const current = (now.getTime() - start.getTime()) / 86400000;
+      setLightHeight(Math.min((current / total) * 100, 100));
     };
 
-    calculateLightHeight();
+    updateLightHeight();
   }, []);
-
-  const [result, setResult] = useState<string>("");
-  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
-  const [sunTimes, setSunTimes] = useState<{
-    sunrise: string;
-    sunset: string;
-  } | null>(null);
 
   useEffect(() => {
-    const checkTouchDevice = () => {
-      setIsTouchDevice(
-        "ontouchstart" in window || navigator.maxTouchPoints > 0,
-      );
-    };
-    checkTouchDevice();
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const cities: City[] = useMemo(
+  const cities = useMemo<City[]>(
     () => [
       { name: "Oslo", latitude: 59.9139 },
       { name: "Bergen", latitude: 60.3913 },
@@ -117,177 +92,132 @@ const App: React.FC = () => {
       { name: "Stavanger", latitude: 58.9699 },
       { name: "Kristiansand", latitude: 58.0848 },
       { name: "Fredrikstad", latitude: 59.135 },
-      { name: "Longyearbyen", latitude: 78.2166658 },
+      { name: "Longyearbyen", latitude: 78.2167 },
     ],
     [],
   );
 
-  // Main logic for selecting city + calculating daylight
   const selectCity = useCallback(
     async (index: number) => {
-      const selectedCity = cities[index];
-
-      const winterSolsticeYear = 2024;
-      const winterSolsticeMonth = 12;
-      const winterSolsticeDay = 21;
-
-      const winterDaylight = calculateDaylight(
-        winterSolsticeYear,
-        winterSolsticeMonth,
-        winterSolsticeDay,
-        selectedCity.latitude,
-      );
-
-      const currentYear = currentTime.getFullYear();
-      const currentMonth = currentTime.getMonth() + 1;
-      const currentDay = currentTime.getDate();
-
+      const city = cities[index];
+      const winterDaylight = calculateDaylight(2024, 12, 21, city.latitude);
+      const now = new Date();
       const currentDaylight = calculateDaylight(
-        currentYear,
-        currentMonth,
-        currentDay,
-        selectedCity.latitude,
+        now.getFullYear(),
+        now.getMonth() + 1,
+        now.getDate(),
+        city.latitude,
+      );
+      const winterPrecise = calculateDaylightPrecise(2024, 12, 21, city.latitude);
+      const currentPrecise = calculateDaylightPrecise(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        now.getDate(),
+        city.latitude,
       );
 
-      const winterDaylightPrecise = calculateDaylightPrecise(
-        winterSolsticeYear,
-        winterSolsticeMonth,
-        winterSolsticeDay,
-        selectedCity.latitude,
-      );
-
-      const currentDaylightPrecise = calculateDaylightPrecise(
-        currentYear,
-        currentMonth,
-        currentDay,
-        selectedCity.latitude,
-      );
-
-      const daylightDifference = currentDaylight - winterDaylight;
-      const daylightDifferencePrecise =
-        currentDaylightPrecise.daylightHours -
-        winterDaylightPrecise.daylightHours;
-
-      const hours = Math.floor(daylightDifference);
-      const minutes = Math.round((daylightDifference - hours) * 60);
-
-      const hoursPrecise = Math.floor(daylightDifferencePrecise);
-      const minutesPrecise = Math.round(
-        (daylightDifferencePrecise - hoursPrecise) * 60,
-      );
+      const diffApprox = currentDaylight - winterDaylight;
+      const diffPrecise =
+        currentPrecise.daylightHours - winterPrecise.daylightHours;
+      const hoursApprox = Math.floor(diffApprox);
+      const minutesApprox = Math.round((diffApprox - hoursApprox) * 60);
+      const hoursPrecise = Math.floor(diffPrecise);
+      const minutesPrecise = Math.round((diffPrecise - hoursPrecise) * 60);
 
       setResult(
-        `In ${selectedCity.name}, the day is:\n` +
-          `- Approximate: ${daylightDifference.toFixed(
-            2,
-          )} hours (${hours}h ${minutes}m) longer\n` +
-          `- Precise (NOAA): ${daylightDifferencePrecise.toFixed(
-            2,
-          )} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
-          `- Sunrise (Precise): ${currentDaylightPrecise.sunrise}\n` +
-          `- Sunset (Precise): ${currentDaylightPrecise.sunset}`,
+        `In ${city.name}, the day is:\n` +
+          `- Approximate: ${diffApprox.toFixed(2)} hours (${hoursApprox}h ${minutesApprox}m) longer\n` +
+          `- Precise (NOAA): ${diffPrecise.toFixed(2)} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
+          `- Sunrise (Precise): ${currentPrecise.sunrise}\n` +
+          `- Sunset (Precise): ${currentPrecise.sunset}`,
       );
-
-      setPreciseTimes(currentDaylightPrecise);
+      setPreciseTimes(currentPrecise);
 
       try {
         const response = await fetch(
-          `https://api.sunrise-sunset.org/json?lat=${selectedCity.latitude}&lng=0&formatted=0`,
+          `https://api.sunrise-sunset.org/json?lat=${city.latitude}&lng=0&formatted=0`,
         );
-        if (!response.ok) throw new Error("API Error");
-
         const data = await response.json();
-
         setSunTimes({
           sunrise: new Date(data.results.sunrise).toLocaleTimeString(),
           sunset: new Date(data.results.sunset).toLocaleTimeString(),
         });
-      } catch (error) {
-        console.error(error);
+      } catch {
         setSunTimes(null);
       }
     },
-    [cities, currentTime],
+    [cities],
   );
 
   useEffect(() => {
-    if (!isTouchDevice) {
-      const handleKeyPress = (event: KeyboardEvent) => {
-        const key = event.key;
-        const choice = parseInt(key, 10);
+    if (isTouchDevice) return;
 
-        if (choice >= 1 && choice <= cities.length) {
-          selectCity(choice - 1);
-        }
-      };
+    const handler = (event: KeyboardEvent) => {
+      const choice = parseInt(event.key, 10);
+      if (choice >= 1 && choice <= cities.length) {
+        selectCity(choice - 1);
+      }
+    };
 
-      window.addEventListener("keypress", handleKeyPress);
-      return () => window.removeEventListener("keypress", handleKeyPress);
-    }
-  }, [cities, selectCity, isTouchDevice]);
+    window.addEventListener("keypress", handler);
+    return () => window.removeEventListener("keypress", handler);
+  }, [cities, isTouchDevice, selectCity]);
 
   return (
-    <div className="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4">
-      <div className="w-full bg-gray-700 flex flex-col items-center justify-center p-4">
-        <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
-        <div className="bg-blue-300 p-6 rounded-lg shadow-md w-full max-w-md">
-          <p className="mb-4" data-testid="current-date-time">
-            Current day, date, and time: {currentTime.toLocaleString()}
-          </p>
-          <p className="mb-4">
-            Choose a city to see how much longer the day is:
-          </p>
-          {isTouchDevice ? (
-            <div className="grid grid-cols-2 gap-2">
-              {cities.map((city, index) => (
-                <button
-                  key={index}
-                  className="bg-yellow-300 text-white p-2 rounded-md text-center"
-                  onClick={() => selectCity(index)}
-                >
-                  {city.name}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <ul className="mb-4">
-              {cities.map((city, index) => (
-                <li
-                  key={index}
-                  className="mb-2 cursor-pointer"
-                  onClick={() => selectCity(index)}
-                >
-                  Press <strong>{index + 1}</strong> for {city.name}
-                </li>
-              ))}
-            </ul>
-          )}
-          {result && (
-            <div className="mt-4 text-center">
-              {result.split("\n").map((line, idx) => (
-                <div key={idx}>{line}</div>
-              ))}
-            </div>
-          )}
-          {sunTimes && preciseTimes && (
-            <div className="mt-4">
-              <p>Sunrise (API): {sunTimes.sunrise}</p>
-              <p>Sunrise (Precise): {preciseTimes.sunrise}</p>
-              <p>Sunset (API): {sunTimes.sunset}</p>
-              <p>Sunset (Precise): {preciseTimes.sunset}</p>
-            </div>
-          )}
+    <div className="main-bg">
+      <div className="card">
+        <h1>Winter Solstice Calculator</h1>
+        <p className="timestamp" data-testid="current-date-time">
+          Current day, date, and time: {currentTime.toLocaleString()}
+        </p>
+        <p className="subtitle">Choose a city to see how much longer the day is:</p>
+        {isTouchDevice ? (
+          <div className="city-grid">
+            {cities.map((city, index) => (
+              <button
+                key={city.name}
+                className="city-btn"
+                onClick={() => selectCity(index)}
+              >
+                {city.name}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <ul className="city-list">
+            {cities.map((city, index) => (
+              <li key={city.name} onClick={() => selectCity(index)}>
+                Press <strong>{index + 1}</strong> for {city.name}
+              </li>
+            ))}
+          </ul>
+        )}
+        {result && (
+          <div className="result">
+            {result.split("\n").map((line, idx) => (
+              <p key={`${line}-${idx}`}>{line}</p>
+            ))}
+          </div>
+        )}
+        {sunTimes && preciseTimes && (
+          <div className="sun-info">
+            <p>Sunrise (API): {sunTimes.sunrise}</p>
+            <p>
+              Sunrise (Precise): {preciseTimes.sunrise || "N/A"}
+            </p>
+            <p>Sunset (API): {sunTimes.sunset}</p>
+            <p>Sunset (Precise): {preciseTimes.sunset || "N/A"}</p>
+          </div>
+        )}
+        <div className="countdown">
           Countdown to Winter Solstice:{" "}
           <span data-testid="solstice-countdown">
             {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
             {countdown.seconds}s
           </span>
-          <div className="sun-container mt-4">
-            <div
-              className="sun-light"
-              style={{ height: `${lightHeight}%` }}
-            ></div>
-          </div>
+        </div>
+        <div className="sun-container">
+          <div className="sun-light" style={{ height: `${lightHeight}%` }} />
         </div>
       </div>
     </div>

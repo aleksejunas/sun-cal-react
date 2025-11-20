@@ -1,0 +1,179 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 9f5902d..2e4aa73 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -12,7 +12,15 @@ import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
+ // And of course the color palette from the moon boxes box
+ 
+ // -- Commiting --
+-// TODO: Lage en counter som teller ned til vintersolverv med dager, timer, minutter og sekunder
++// TODO: Legge til precise calculation og for soloppgang og solnedgang
++
++// Type for precise calculation result
++type DaylightPreciseResult = {
++  daylightHours: number;
++  sunrise: string;
++  sunset: string;
++};
++
+ type City = {
+   name: string;
+   latitude: number;
+@@ -20,6 +28,8 @@ type City = {
+ 
+ const App: React.FC = () => {
+   const [currentTime, setCurrentTime] = useState<Date>(new Date());
++  const [preciseTimes, setPreciseTimes] =
++    useState<DaylightPreciseResult | null>(null);
+ 
+   // Update current time every second
+   useEffect(() => {
+@@ -186,11 +196,10 @@ const App: React.FC = () => {
+         selectedCity.latitude,
+       );
+ 
+-      // const currentDaylightPrecise = calculateDaylightPrecise(currentYear);
+-
+       const daylightDifference = currentDaylight - winterDaylight;
+       const daylightDifferencePrecise =
+-        currentDaylightPrecise - winterDaylightPrecise;
++        currentDaylightPrecise.daylightHours -
++        winterDaylightPrecise.daylightHours;
+ 
+       const hours = Math.floor(daylightDifference);
+       const minutes = Math.round((daylightDifference - hours) * 60);
+@@ -203,14 +212,12 @@ const App: React.FC = () => {
+       setResult(
+         `In ${selectedCity.name}, the day is:\n` +
+           `- Approximate: ${daylightDifference.toFixed(2)} hours (${hours}h ${minutes}m) longer\n` +
+-          ` - Precise (NOAA: ${daylightDifference.toFixed(2)} hours(${hoursPrecise}h ${minutesPrecise}m) longer.`,
++          `- Precise (NOAA): ${daylightDifferencePrecise.toFixed(2)} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
++          `- Sunrise (Precise): ${currentDaylightPrecise.sunrise}\n` +
++          `- Sunset (Precise): ${currentDaylightPrecise.sunset}`,
+       );
+ 
+-      // setResult(
+-      //   `In ${selectedCity.name}, the day is ${daylightDifference.toFixed(
+-      //     2,
+-      //   )} hours (${hours} hours and ${minutes} minutes) longer.`,
+-      // );
++      setPreciseTimes(currentDaylightPrecise);
+ 
+       try {
+         const response = await fetch(
+@@ -249,7 +256,7 @@ const App: React.FC = () => {
+   }, [cities, selectCity, isTouchDevice]);
+ 
+   return (
+-    <div className=" w-full bg-gray-700 flex flex-col items-center justify-center p-4">
++    <div className="w-full bg-gray-700 flex flex-col items-center justify-center p-4">
+       <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
+       <div className="bg-blue-300 p-6 rounded-lg shadow-md w-full max-w-md">
+         <p className="mb-4" data-testid="current-date-time">
+@@ -257,7 +264,6 @@ const App: React.FC = () => {
+         </p>
+         <p className="mb-4">Choose a city to see how much longer the day is:</p>
+         {isTouchDevice ? (
+-          // Render buttons for touchscreen devices
+           <div className="grid grid-cols-2 gap-2">
+             {cities.map((city, index) => (
+               <button
+@@ -270,7 +276,6 @@ const App: React.FC = () => {
+             ))}
+           </div>
+         ) : (
+-          // Render text instructions for keyboard selection
+           <ul className="mb-4">
+             {cities.map((city, index) => (
+               <li
+@@ -283,11 +288,19 @@ const App: React.FC = () => {
+             ))}
+           </ul>
+         )}
+-        {result && <p className="mt-4 text-center">{result}</p>}
+-        {sunTimes && (
++        {result && (
++          <div className="mt-4 text-center">
++            {result.split("\n").map((line, idx) => (
++              <div key={idx}>{line}</div>
++            ))}
++          </div>
++        )}
++        {sunTimes && preciseTimes && (
+           <div className="mt-4">
+-            <p>Sunrise: {sunTimes.sunrise}</p>
+-            <p>Sunset: {sunTimes.sunset}</p>
++            <p>Sunrise (API): {sunTimes.sunrise}</p>
++            <p>Sunrise (Precise): {preciseTimes.sunrise}</p>
++            <p>Sunset (API): {sunTimes.sunset}</p>
++            <p>Sunset (Precise): {preciseTimes.sunset}</p>
+           </div>
+         )}
+         Countdown to Winter Solstice:{" "}
+@@ -305,4 +318,5 @@ const App: React.FC = () => {
+     </div>
+   );
+ };
++
+ export default App;
+diff --git a/src/utils/calculateDaylightPrecise.ts b/src/utils/calculateDaylightPrecise.ts
+index 0970e77..3e243ec 100644
+--- a/src/utils/calculateDaylightPrecise.ts
++++ b/src/utils/calculateDaylightPrecise.ts
+@@ -6,19 +6,22 @@
+  * @param {number} month - The month (1-12)
+  * @param {number} day - The day of the month (1-31)
+  * @param {number} latitude - Latitude in degrees (positive for north, negative for south)
+- * @returns {number} The number of daylight hours for the specified date and latitude
++ * @returns {{ daylightHours: number, sunrise: string, sunset: string}} The number of daylight hours for the specified date and latitude
+  */
+ 
++type DaylightPreciseResult = {
++  daylightHours: number;
++  sunrise: string;
++  sunset: string;
++};
++
+ const calculateDaylightPrecise = (
+   year: number,
+   month: number,
+   day: number,
+   latitude: number,
+-): number => {
+-  // Convert latitude to radians
++): DaylightPreciseResult => {
+   const latRad = (latitude * Math.PI) / 180;
+-
+-  // Calculate Julian day
+   const N1 = Math.floor((275 * month) / 9);
+   const N2 = Math.floor((month + 9) / 12);
+   const N3 = 1 + Math.floor((year - 4 * Math.floor(year / 4) + 2) / 3);
+@@ -34,15 +37,21 @@ const calculateDaylightPrecise = (
+     0.002697 * Math.cos(3 * gamma) +
+     0.00148 * Math.sin(3 * gamma);
+ 
+-  // Calculate solar declination (NOAA formula)
+   const cosH = -Math.tan(latRad) * Math.tan(decl);
+-  if (cosH >= 1) return 0; // Polar night
+-  if (cosH <= -1) return 24; // Midnight sun
+-
+-  const H = Math.acos(cosH); // radians
++  let daylightHours = 0;
++  if (cosH >= 1) daylightHours = 0;
++  else if (cosH <= -1) daylightHours = 24;
++  else {
++    const H = Math.acos(cosH);
++    daylightHours = (2 * H * 180) / Math.PI / 15;
++  }
+ 
+-  // Daylight hours = 2 * H (in degrees) / 15 (degrees per hour)
+-  return (2 * H * 180) / Math.PI / 15;
++  // Placeholder for sunrise/sunset
++  return {
++    daylightHours,
++    sunrise: "",
++    sunset: "",
++  };
+ };
+ 
+ export default calculateDaylightPrecise;

@@ -1,0 +1,330 @@
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import "./App.css";
+import { calculateDaylight } from "./utils/calculateDaylight";
+
+// -- STYLING --
+// TODO: Style the app like the box for the moon moon boxes box HA HA!
+// TODO: Make a nice css animation for the sun
+
+// Nice Colors to use: #87CEEB, #FFA500, #FF4500, #FFB6C1, #191970, #FDFD96, #D3D3D3
+// Change the background color on differtent times of the day
+// And of course the color palette from the moon boxes box
+
+// -- Commiting --
+// TODO: Legge til precise calculation og for soloppgang og solnedgang
+
+// Type for precise calculation result
+type DaylightPreciseResult = {
+  daylightHours: number;
+  sunrise: string;
+  sunset: string;
+};
+
+type City = {
+  name: string;
+  latitude: number;
+};
+
+const App: React.FC = () => {
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [preciseTimes, setPreciseTimes] =
+    useState<DaylightPreciseResult | null>(null);
+
+  // Update current time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Countdown timer state
+  const [countdown, setCountdown] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  }>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 9,
+  });
+
+  // Countdown timer effect
+  useEffect(() => {
+    /** Countdown timer effect
+     * Updates the countdown timer to the next winter solstice.
+     * Calculates days, hours, minutes, and seconds remaining.
+     */
+
+    const updateCountdown = () => {
+      const nowTime = new Date();
+      const winterSolstice = new Date(nowTime.getFullYear(), 11, 21, 0, 0, 0);
+      let target = winterSolstice;
+      if (nowTime > winterSolstice) {
+        target = new Date(nowTime.getFullYear() + 1, 11, 21, 0, 0, 0);
+      }
+      const diff = target.getTime() - nowTime.getTime();
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      setCountdown({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  /** Light height calculation
+   * Calculates the percentage of days passed from the start of the year
+   * to the summer solstice (June 21st), representing the "height" of daylight.
+   * @returns {number} Percentage (0 - 100) of days passed to solstice
+   */
+
+  const [lightHeight, setLightHeight] = useState<number>(() => {
+    const now = new Date();
+    const longestDay = new Date(now.getFullYear(), 5, 21); // June 21st
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const totalDays =
+      (longestDay.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+    const currentDays =
+      (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+    return Math.min((currentDays / totalDays) * 100, 100);
+  });
+
+  useEffect(() => {
+    /**
+     * Updates the lightHeight state to reflect the current percentage of days
+     * passed from the start of the year to the summer solstice
+     */
+
+    const calculateLightHeight = () => {
+      const now = new Date();
+      const longestDay = new Date(now.getFullYear(), 5, 21); // June 21st
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const totalDays =
+        (longestDay.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+      const currentDays =
+        (now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
+      const percentage = Math.min((currentDays / totalDays) * 100, 100);
+      setLightHeight(percentage);
+    };
+
+    calculateLightHeight();
+  }, []);
+
+  const [result, setResult] = useState<string>("");
+  // const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
+  const [sunTimes, setSunTimes] = useState<{
+    sunrise: string;
+    sunset: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      setIsTouchDevice(
+        "ontouchstart" in window || navigator.maxTouchPoints > 0,
+      );
+    };
+    checkTouchDevice();
+  }, []);
+
+  const cities: City[] = useMemo(
+    () => [
+      { name: "Oslo", latitude: 59.9139 },
+      { name: "Bergen", latitude: 60.3913 },
+      { name: "Trondheim", latitude: 63.4305 },
+      { name: "Tromsø", latitude: 69.6496 },
+      { name: "Stavanger", latitude: 58.9699 },
+      { name: "Kristiansand", latitude: 58.0848 },
+      { name: "Fredrikstad", latitude: 59.135 },
+      { name: "Longyearbyen", latitude: 78.2166658 },
+    ],
+    [],
+  );
+
+  // const now = useMemo(() => new Date(), []);
+
+  /**
+   * Handles city selection, calculates daylight difference from winter solstice,
+   * fetches sunrise/sunset times, and updates result state.
+   * @param {number} index - Index of the selected city in the cities array.
+   */
+
+  const selectCity = useCallback(
+    async (index: number) => {
+      const selectedCity = cities[index];
+
+      const winterSolsticeYear = 2024;
+      const winterSolsticeMonth = 12;
+      const winterSolsticeDay = 21;
+
+      const winterDaylight = calculateDaylight(
+        winterSolsticeYear,
+        winterSolsticeMonth,
+        winterSolsticeDay,
+        selectedCity.latitude,
+      );
+
+      const currentYear = currentTime.getFullYear();
+      const currentMonth = currentTime.getMonth() + 1;
+      const currentDay = currentTime.getDate();
+
+      const currentDaylight = calculateDaylight(
+        currentYear,
+        currentMonth,
+        currentDay,
+        selectedCity.latitude,
+      );
+
+<<<<<<< Updated upstream
+      const daylightDifference = currentDaylight - winterDaylight;
+=======
+      const currentDaylightPrecise = calculateDaylightPrecise(
+        currentYear,
+        currentMonth,
+        currentDay,
+        selectedCity.latitude,
+      );
+
+      const daylightDifference = currentDaylight - winterDaylight;
+      const daylightDifferencePrecise =
+        currentDaylightPrecise.daylightHours -
+        winterDaylightPrecise.daylightHours;
+
+>>>>>>> Stashed changes
+      const hours = Math.floor(daylightDifference);
+      const minutes = Math.round((daylightDifference - hours) * 60);
+
+      setResult(
+<<<<<<< Updated upstream
+        `In ${selectedCity.name}, the day is ${daylightDifference.toFixed(
+          2,
+        )} hours (${hours} hours and ${minutes} minutes) longer.`,
+      );
+
+=======
+        `In ${selectedCity.name}, the day is:\n` +
+          `- Approximate: ${daylightDifference.toFixed(2)} hours (${hours}h ${minutes}m) longer\n` +
+          `- Precise (NOAA): ${daylightDifferencePrecise.toFixed(2)} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
+          `- Sunrise (Precise): ${currentDaylightPrecise.sunrise}\n` +
+          `- Sunset (Precise): ${currentDaylightPrecise.sunset}`,
+      );
+
+      setPreciseTimes(currentDaylightPrecise);
+
+>>>>>>> Stashed changes
+      try {
+        const response = await fetch(
+          `https://api.sunrise-sunset.org/json?lat=${selectedCity.latitude}&lng=0&formatted=0`,
+        );
+        if (!response.ok) throw new Error("API Error");
+
+        const data = await response.json();
+
+        setSunTimes({
+          sunrise: new Date(data.results.sunrise).toLocaleTimeString(),
+          sunset: new Date(data.results.sunset).toLocaleTimeString(),
+        });
+      } catch (error) {
+        console.error(error);
+        setSunTimes(null);
+      }
+    },
+    [cities, currentTime],
+  );
+
+  useEffect(() => {
+    if (!isTouchDevice) {
+      const handleKeyPress = (event: KeyboardEvent) => {
+        const key = event.key;
+        const choice = parseInt(key, 10);
+
+        if (choice >= 1 && choice <= cities.length) {
+          selectCity(choice - 1);
+        }
+      };
+
+      window.addEventListener("keypress", handleKeyPress);
+      return () => window.removeEventListener("keypress", handleKeyPress);
+    }
+  }, [cities, selectCity, isTouchDevice]);
+
+  return (
+<<<<<<< Updated upstream
+    <div className="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4">
+=======
+    <div className="w-full bg-gray-700 flex flex-col items-center justify-center p-4">
+>>>>>>> Stashed changes
+      <h1 className="text-3xl font-bold mb-4">Winter Solstice Calculator</h1>
+      <div className="bg-blue-300 p-6 rounded-lg shadow-md w-full max-w-md">
+        <p className="mb-4" data-testid="current-date-time">
+          Current day, date, and time: {currentTime.toLocaleString()}
+        </p>
+        <p className="mb-4">Choose a city to see how much longer the day is:</p>
+        {isTouchDevice ? (
+          <div className="grid grid-cols-2 gap-2">
+            {cities.map((city, index) => (
+              <button
+                key={index}
+                className="bg-yellow-300 text-white p-2 rounded-md text-center"
+                onClick={() => selectCity(index)}
+              >
+                {city.name}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <ul className="mb-4">
+            {cities.map((city, index) => (
+              <li
+                key={index}
+                className="mb-2 cursor-pointer"
+                onClick={() => selectCity(index)}
+              >
+                Press <strong>{index + 1}</strong> for {city.name}
+              </li>
+            ))}
+          </ul>
+        )}
+        {result && (
+          <div className="mt-4 text-center">
+            {result.split("\n").map((line, idx) => (
+              <div key={idx}>{line}</div>
+            ))}
+          </div>
+        )}
+        {sunTimes && preciseTimes && (
+          <div className="mt-4">
+            <p>Sunrise (API): {sunTimes.sunrise}</p>
+            <p>Sunrise (Precise): {preciseTimes.sunrise}</p>
+            <p>Sunset (API): {sunTimes.sunset}</p>
+            <p>Sunset (Precise): {preciseTimes.sunset}</p>
+          </div>
+        )}
+        Countdown to Winter Solstice:{" "}
+        <span data-testid="solstice-countdown">
+          {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
+          {countdown.seconds}s
+        </span>
+        <div className="sun-container mt-4">
+          <div
+            className="sun-light"
+            style={{ height: `${lightHeight}%` }}
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+// const now = new Date();
+// const currentYear = now.getFullYear();
+// const currentMonth = now.getMonth() + 1;
+// const currentDay = now.getDate();

@@ -1,3 +1,4 @@
+// filepath: src/App.tsx;
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 import calculateDaylight from "./utils/calculateDaylight";
@@ -9,20 +10,6 @@ type DaylightPreciseResult = {
   sunrise: string;
   sunset: string;
 };
-
-// Nice Colors to use: #87CEEB, #FFA500, #FF4500, #FFB6C1, #191970, #FDFD96, #D3D3D3
-// Change the background color on differtent times of the day
-// And of course the color palette from the moon boxes box
-
-// -- Commiting --
-// TODO: Legge til precise calculation og for soloppgang og solnedgang
-
-// Type for precise calculation result
-// type DaylightPreciseResult = {
-//   daylightHours: number;
-//   sunrise: string;
-//   sunset: string;
-// };
 
 type City = {
   name: string;
@@ -197,8 +184,6 @@ const App: React.FC = () => {
           `- Precise (NOAA): ${daylightDifferencePrecise.toFixed(
             2,
           )} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
-          `- Approximate: ${daylightDifference.toFixed(2)} hours (${hours}h ${minutes}m) longer\n` +
-          `- Precise (NOAA): ${daylightDifferencePrecise.toFixed(2)} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
           `- Sunrise (Precise): ${currentDaylightPrecise.sunrise}\n` +
           `- Sunset (Precise): ${currentDaylightPrecise.sunset}`,
       );

@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
-import { calculateDaylight } from "./utils/calculateDaylight";
+import calculateDaylight from "./utils/calculateDaylight";
+import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
 
-// -- STYLING --
-// TODO: Style the app like the box for the moon moon boxes box HA HA!
-// TODO: Make a nice css animation for the sun
+// Type for precise calculation result
+type DaylightPreciseResult = {
+  daylightHours: number;
+  sunrise: string;
+  sunset: string;
+};
 
-// Nice Colors to use: #87CEEB, #FFA500, #FF4500, #FFB6C1, #191970, #FDFD96, #D3D3D3
-// Change the background color on differtent times of the day
-// And of course the color palette from the moon boxes box
-
-// -- Commiting --
-// TODO: Lage en counter som teller ned til vintersolverv med dager, timer, minutter og sekunder
 type City = {
   name: string;
   latitude: number;
@@ -19,6 +17,8 @@ type City = {
 
 const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [preciseTimes, setPreciseTimes] =
+    useState<DaylightPreciseResult | null>(null);
 
   // Update current time every second
   useEffect(() => {
@@ -43,11 +43,6 @@ const App: React.FC = () => {
 
   // Countdown timer effect
   useEffect(() => {
-    /** Countdown timer effect
-     * Updates the countdown timer to the next winter solstice.
-     * Calculates days, hours, minutes, and seconds remaining.
-     */
-
     const updateCountdown = () => {
       const nowTime = new Date();
       const winterSolstice = new Date(nowTime.getFullYear(), 11, 21, 0, 0, 0);
@@ -68,15 +63,10 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  /** Light height calculation
-   * Calculates the percentage of days passed from the start of the year
-   * to the summer solstice (June 21st), representing the "height" of daylight.
-   * @returns {number} Percentage (0 - 100) of days passed to solstice
-   */
-
+  // Light height percentage (year progress to summer solstice)
   const [lightHeight, setLightHeight] = useState<number>(() => {
     const now = new Date();
-    const longestDay = new Date(now.getFullYear(), 5, 21); // June 21st
+    const longestDay = new Date(now.getFullYear(), 5, 21);
     const startOfYear = new Date(now.getFullYear(), 0, 1);
     const totalDays =
       (longestDay.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
@@ -86,14 +76,9 @@ const App: React.FC = () => {
   });
 
   useEffect(() => {
-    /**
-     * Updates the lightHeight state to reflect the current percentage of days
-     * passed from the start of the year to the summer solstice
-     */
-
     const calculateLightHeight = () => {
       const now = new Date();
-      const longestDay = new Date(now.getFullYear(), 5, 21); // June 21st
+      const longestDay = new Date(now.getFullYear(), 5, 21);
       const startOfYear = new Date(now.getFullYear(), 0, 1);
       const totalDays =
         (longestDay.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24);
@@ -107,7 +92,6 @@ const App: React.FC = () => {
   }, []);
 
   const [result, setResult] = useState<string>("");
-  // const [daylightPercentage, setDaylightPercentage] = useState<number>(0);
   const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
   const [sunTimes, setSunTimes] = useState<{
     sunrise: string;
@@ -137,14 +121,7 @@ const App: React.FC = () => {
     [],
   );
 
-  // const now = useMemo(() => new Date(), []);
-
-  /**
-   * Handles city selection, calculates daylight difference from winter solstice,
-   * fetches sunrise/sunset times, and updates result state.
-   * @param {number} index - Index of the selected city in the cities array.
-   */
-
+  // Main logic for selecting city + calculating daylight
   const selectCity = useCallback(
     async (index: number) => {
       const selectedCity = cities[index];
@@ -171,15 +148,46 @@ const App: React.FC = () => {
         selectedCity.latitude,
       );
 
+      const winterDaylightPrecise = calculateDaylightPrecise(
+        winterSolsticeYear,
+        winterSolsticeMonth,
+        winterSolsticeDay,
+        selectedCity.latitude,
+      );
+
+      const currentDaylightPrecise = calculateDaylightPrecise(
+        currentYear,
+        currentMonth,
+        currentDay,
+        selectedCity.latitude,
+      );
+
       const daylightDifference = currentDaylight - winterDaylight;
+      const daylightDifferencePrecise =
+        currentDaylightPrecise.daylightHours -
+        winterDaylightPrecise.daylightHours;
+
       const hours = Math.floor(daylightDifference);
       const minutes = Math.round((daylightDifference - hours) * 60);
 
-      setResult(
-        `In ${selectedCity.name}, the day is ${daylightDifference.toFixed(
-          2,
-        )} hours (${hours} hours and ${minutes} minutes) longer.`,
+      const hoursPrecise = Math.floor(daylightDifferencePrecise);
+      const minutesPrecise = Math.round(
+        (daylightDifferencePrecise - hoursPrecise) * 60,
       );
+
+      setResult(
+        `In ${selectedCity.name}, the day is:\n` +
+          `- Approximate: ${daylightDifference.toFixed(
+            2,
+          )} hours (${hours}h ${minutes}m) longer\n` +
+          `- Precise (NOAA): ${daylightDifferencePrecise.toFixed(
+            2,
+          )} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
+          `- Sunrise (Precise): ${currentDaylightPrecise.sunrise}\n` +
+          `- Sunset (Precise): ${currentDaylightPrecise.sunset}`,
+      );
+
+      setPreciseTimes(currentDaylightPrecise);
 
       try {
         const response = await fetch(
@@ -226,7 +234,6 @@ const App: React.FC = () => {
         </p>
         <p className="mb-4">Choose a city to see how much longer the day is:</p>
         {isTouchDevice ? (
-          // Render buttons for touchscreen devices
           <div className="grid grid-cols-2 gap-2">
             {cities.map((city, index) => (
               <button
@@ -239,7 +246,6 @@ const App: React.FC = () => {
             ))}
           </div>
         ) : (
-          // Render text instructions for keyboard selection
           <ul className="mb-4">
             {cities.map((city, index) => (
               <li
@@ -252,11 +258,19 @@ const App: React.FC = () => {
             ))}
           </ul>
         )}
-        {result && <p className="mt-4 text-center">{result}</p>}
-        {sunTimes && (
+        {result && (
+          <div className="mt-4 text-center">
+            {result.split("\n").map((line, idx) => (
+              <div key={idx}>{line}</div>
+            ))}
+          </div>
+        )}
+        {sunTimes && preciseTimes && (
           <div className="mt-4">
-            <p>Sunrise: {sunTimes.sunrise}</p>
-            <p>Sunset: {sunTimes.sunset}</p>
+            <p>Sunrise (API): {sunTimes.sunrise}</p>
+            <p>Sunrise (Precise): {preciseTimes.sunrise}</p>
+            <p>Sunset (API): {sunTimes.sunset}</p>
+            <p>Sunset (Precise): {preciseTimes.sunset}</p>
           </div>
         )}
         Countdown to Winter Solstice:{" "}
@@ -276,8 +290,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-// const now = new Date();
-// const currentYear = now.getFullYear();
-// const currentMonth = now.getMonth() + 1;
-// const currentDay = now.getDate();

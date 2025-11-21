@@ -1,67 +1,21 @@
-# React + TypeScript + Vite
+# Winter Solstice Calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Single-page React app that compares today's daylight to the winter solstice for a handful of Norwegian cities. Calculations and sunrise/sunset times come from the local NOAA-based helper, so it works offline without any external API calls.
 
-Currently, two official plugins are available:
+## How it works
+- Pick a city with the number keys (1–8) or tap the buttons on touch devices.
+- The app shows how much longer today is than December 21, along with sunrise and sunset for the selected city.
+- A small countdown tracks time left until the next winter solstice, and the sun bar fills as we move toward midsummer.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+## Running it
 ```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from "eslint-plugin-react";
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: "18.3" } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs["jsx-runtime"].rules,
-  },
-});
-```
-
-# sun-cal-react
-
-## Sunrise/Sunset data sources
-
-The app currently relies on the local NOAA-based helper (`calculateDaylightPrecise.ts`) for both daylight length and sunrise/sunset times. If you need to compare those values with a third-party source, it is straightforward to reintroduce the `https://api.sunrise-sunset.org` fetch inside `src/App.tsx` (right after selecting a city). Keeping the helper-only approach means the UI works offline and avoids external dependencies, while the API option can serve as an extra validation step when desired.
-
-## Running with pnpm
-
-All scripts are compatible with pnpm. Typical workflow:
-
-```bash
 pnpm install
-pnpm dev      # start Vite dev server
-pnpm build    # type-check + production build
-pnpm test     # (configure your preferred runner here)
+pnpm dev    # start Vite dev server
+pnpm build  # type-check + production build
+pnpm test   # run tests
 ```
+
+## Notes
+- City list and UI live in `src/App.tsx`.
+- Daylight math is in `src/utils/calculateDaylightPrecise.ts`.
+- The daylight math uses a standard NOAA-based formula; I didn’t invent it, but I verified it locally and rely on it for sunrise/sunset as well.

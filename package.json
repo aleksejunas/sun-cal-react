@@ -12,7 +12,7 @@
     "test:coverage": "react-scripts test --coverage --watchAll=false"
   },
   "dependencies": {
-    "@testing-library/react": "^16.2.0",
+    "@testing-library/react": "^16.3.0",
     "jest-fetch-mock": "^3.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -21,34 +21,39 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.26.0",
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^9.21.0",
     "@jest/globals": "^29.7.0",
     "@jest/types": "^29.6.3",
-    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/jest-dom": "^6.9.1",
     "@types/jest": "^29.5.14",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.20",
-    "eslint": "^9.17.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.16",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
     "extend-expect": "link:@testing-library/jest-dom/extend-expect",
-    "globals": "^15.14.0",
+    "globals": "^15.15.0",
     "identity-obj-proxy": "^3.0.0",
     "jest-environment-jsdom": "^29.7.0",
     "msw": "^2.7.3",
-    "postcss": "^8.5.1",
-    "tailwindcss": "^3.4.17",
-    "ts-jest": "^29.2.6",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.18",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
-    "typescript": "~5.6.2",
-    "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.5"
+    "typescript": "~5.6.3",
+    "typescript-eslint": "^8.25.0",
+    "vite": "^6.4.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "msw"
-    ]
+    ],
+    "overrides": {
+      "form-data": "4.0.4",
+      "js-yaml": "3.14.2",
+      "brace-expansion": "2.0.2"
+    }
   }
 }

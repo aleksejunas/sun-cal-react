@@ -1,8 +1,7 @@
 # Winter Solstice Calculator (Suncal) Dev Plan
 
-## TODOS
-
+## Todos
 - [ ] Better styling
-- [ ] Add a reset button
-- [ ] animate the sun
-- [ ] Make it more modular
+- [ ] Add a reset button
+- [ ] Animate the sun
+- [ ] Make it more modular

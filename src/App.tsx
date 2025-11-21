@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
-import calculateDaylight from "./utils/calculateDaylight";
 import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
 
 type DaylightPreciseResult = {
@@ -12,11 +11,6 @@ type DaylightPreciseResult = {
 type City = {
   name: string;
   latitude: number;
-};
-
-type SunTimes = {
-  sunrise: string;
-  sunset: string;
 };
 
 const App: React.FC = () => {
@@ -39,7 +33,6 @@ const App: React.FC = () => {
   });
   const [result, setResult] = useState("");
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [sunTimes, setSunTimes] = useState<SunTimes | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -100,15 +93,13 @@ const App: React.FC = () => {
   const selectCity = useCallback(
     async (index: number) => {
       const city = cities[index];
-      const winterDaylight = calculateDaylight(2024, 12, 21, city.latitude);
       const now = new Date();
-      const currentDaylight = calculateDaylight(
-        now.getFullYear(),
-        now.getMonth() + 1,
-        now.getDate(),
+      const winterPrecise = calculateDaylightPrecise(
+        2024,
+        12,
+        21,
         city.latitude,
       );
-      const winterPrecise = calculateDaylightPrecise(2024, 12, 21, city.latitude);
       const currentPrecise = calculateDaylightPrecise(
         now.getFullYear(),
         now.getMonth() + 1,
@@ -116,35 +107,16 @@ const App: React.FC = () => {
         city.latitude,
       );
 
-      const diffApprox = currentDaylight - winterDaylight;
       const diffPrecise =
         currentPrecise.daylightHours - winterPrecise.daylightHours;
-      const hoursApprox = Math.floor(diffApprox);
-      const minutesApprox = Math.round((diffApprox - hoursApprox) * 60);
       const hoursPrecise = Math.floor(diffPrecise);
       const minutesPrecise = Math.round((diffPrecise - hoursPrecise) * 60);
 
       setResult(
-        `In ${city.name}, the day is:\n` +
-          `- Approximate: ${diffApprox.toFixed(2)} hours (${hoursApprox}h ${minutesApprox}m) longer\n` +
-          `- Precise (NOAA): ${diffPrecise.toFixed(2)} hours (${hoursPrecise}h ${minutesPrecise}m) longer\n` +
-          `- Sunrise (Precise): ${currentPrecise.sunrise}\n` +
-          `- Sunset (Precise): ${currentPrecise.sunset}`,
+        `Dagen er i ${city.name}` +
+          ` ${diffPrecise.toFixed(2)} timer (${hoursPrecise}h ${minutesPrecise}m) lengre enn ved vintersolverv`,
       );
       setPreciseTimes(currentPrecise);
-
-      try {
-        const response = await fetch(
-          `https://api.sunrise-sunset.org/json?lat=${city.latitude}&lng=0&formatted=0`,
-        );
-        const data = await response.json();
-        setSunTimes({
-          sunrise: new Date(data.results.sunrise).toLocaleTimeString(),
-          sunset: new Date(data.results.sunset).toLocaleTimeString(),
-        });
-      } catch {
-        setSunTimes(null);
-      }
     },
     [cities],
   );
@@ -164,13 +136,16 @@ const App: React.FC = () => {
   }, [cities, isTouchDevice, selectCity]);
 
   return (
-    <div className="main-bg">
-      <div className="card">
-        <h1>Winter Solstice Calculator</h1>
+    <div className="main-bg w-[100vw] h-[100vh]">
+      <div className="card w-[70vw] h- [70vh]">
+        <h1>Vintersolverv Kalkulator</h1>
         <p className="timestamp" data-testid="current-date-time">
-          Current day, date, and time: {currentTime.toLocaleString()}
+          Tid og dato: {currentTime.toLocaleString()}
         </p>
-        <p className="subtitle">Choose a city to see how much longer the day is:</p>
+        <p className="subtitle">
+          Velg en dag for å se hvor mye lengre dagen er sammenlignet med
+          vintersolverv
+        </p>
         {isTouchDevice ? (
           <div className="city-grid">
             {cities.map((city, index) => (
@@ -187,7 +162,7 @@ const App: React.FC = () => {
           <ul className="city-list">
             {cities.map((city, index) => (
               <li key={city.name} onClick={() => selectCity(index)}>
-                Press <strong>{index + 1}</strong> for {city.name}
+                Trykk <strong>{index + 1}</strong> for {city.name}
               </li>
             ))}
           </ul>
@@ -199,18 +174,14 @@ const App: React.FC = () => {
             ))}
           </div>
         )}
-        {sunTimes && preciseTimes && (
+        {preciseTimes && (
           <div className="sun-info">
-            <p>Sunrise (API): {sunTimes.sunrise}</p>
-            <p>
-              Sunrise (Precise): {preciseTimes.sunrise || "N/A"}
-            </p>
-            <p>Sunset (API): {sunTimes.sunset}</p>
-            <p>Sunset (Precise): {preciseTimes.sunset || "N/A"}</p>
+            <p>Sunrise: {preciseTimes.sunrise || "N/A"}</p>
+            <p>Sunset: {preciseTimes.sunset || "N/A"}</p>
           </div>
         )}
         <div className="countdown">
-          Countdown to Winter Solstice:{" "}
+          Nedtelling til vintersolverv:{" "}
           <span data-testid="solstice-countdown">
             {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
             {countdown.seconds}s

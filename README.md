@@ -50,3 +50,18 @@ export default tseslint.config({
 ```
 
 # sun-cal-react
+
+## Sunrise/Sunset data sources
+
+The app currently relies on the local NOAA-based helper (`calculateDaylightPrecise.ts`) for both daylight length and sunrise/sunset times. If you need to compare those values with a third-party source, it is straightforward to reintroduce the `https://api.sunrise-sunset.org` fetch inside `src/App.tsx` (right after selecting a city). Keeping the helper-only approach means the UI works offline and avoids external dependencies, while the API option can serve as an extra validation step when desired.
+
+## Running with pnpm
+
+All scripts are compatible with pnpm. Typical workflow:
+
+```bash
+pnpm install
+pnpm dev      # start Vite dev server
+pnpm build    # type-check + production build
+pnpm test     # (configure your preferred runner here)
+```

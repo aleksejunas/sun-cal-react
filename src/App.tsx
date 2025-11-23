@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
 
+// TODO: Endre bakgrunn etter tid på døgnet (blå himmel etc.)
+
 type DaylightPreciseResult = {
   daylightHours: number;
   sunrise: string;
@@ -113,8 +115,8 @@ const App: React.FC = () => {
       const minutesPrecise = Math.round((diffPrecise - hoursPrecise) * 60);
 
       setResult(
-        `Dagen er i ${city.name}` +
-          ` ${diffPrecise.toFixed(2)} timer (${hoursPrecise}h ${minutesPrecise}m) lengre enn ved vintersolverv`,
+        `${city.name}: Dagen er (${hoursPrecise}h ${minutesPrecise}m)` +
+          ` ${diffPrecise.toFixed(2)} timer  lengre enn ved vintersolverv`,
       );
       setPreciseTimes(currentPrecise);
     },
@@ -139,12 +141,15 @@ const App: React.FC = () => {
     <div className="main-bg w-[100vw] h-[100vh]">
       <div className="card w-[70vw] h- [70vh]">
         <h1>Vintersolverv Kalkulator</h1>
+
         <p className="timestamp" data-testid="current-date-time">
-          Tid og dato: {currentTime.toLocaleString()}
+          {currentTime.toLocaleDateString()}
+          <span className="dot"> • </span>
+          {currentTime.toLocaleTimeString()}
         </p>
+
         <p className="subtitle">
-          Velg en dag for å se hvor mye lengre dagen er sammenlignet med
-          vintersolverv
+          Velg en dag for å sjekke hvor mye lengre dagen er nå
         </p>
         {isTouchDevice ? (
           <div className="city-grid">
@@ -176,8 +181,8 @@ const App: React.FC = () => {
         )}
         {preciseTimes && (
           <div className="sun-info">
-            <p>Sunrise: {preciseTimes.sunrise || "N/A"}</p>
-            <p>Sunset: {preciseTimes.sunset || "N/A"}</p>
+            <p>Sol opp: {preciseTimes.sunrise || "N/A"}</p>
+            <p>Sol ned: {preciseTimes.sunset || "N/A"}</p>
           </div>
         )}
         <div className="countdown">

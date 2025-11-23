@@ -1,3 +1,5 @@
+/* Base */
+
 body {
   margin: 0;
   font-family:
@@ -23,6 +25,8 @@ body,
   padding: 2rem 1rem;
 }
 
+/* Card */
+
 .card {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 1.5rem;
@@ -33,21 +37,80 @@ body,
   text-align: center;
 }
 
+/* Typography */
+
 h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: #ff4500;
   margin-bottom: 1rem;
 }
 
-.timestamp {
+.subtitle {
+  margin: 0.35rem 0 1.25rem;
+  color: #1f2a66;
+  opacity: 0.8;
+  font-size: 1rem;
   font-weight: 500;
-  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
 }
 
-.subtitle {
-  margin: 0.5rem 0 1.5rem;
-  color: #1f2a66;
+/* Timestamp */
+
+.timestamp {
+  display: inline-flex;
+  gap: 0.65rem;
+  padding: 0.25rem 0.8rem;
+  border-radius: 0.5rem;
+
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(6px);
+
+  font-size: 0.95rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+
+  color: #222;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
+
+.timestamp .dot {
+  color: #ff4500;
+  opacity: 0.8;
+}
+
+/* City list */
+
+.city-list {
+  columns: 2;
+  column-gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  text-align: left;
+}
+
+.city-list li {
+  background: rgba(25, 25, 112, 0.08);
+  border: 1px solid rgba(25, 25, 112, 0.09);
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.6rem;
+  border-radius: 0.7rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.city-list li:hover {
+  transform: translateX(2px);
+  box-shadow: 0 4px 12px rgba(25, 25, 112, 0.15);
+}
+
+/* Mobile grid buttons */
 
 .city-grid {
   display: grid;
@@ -64,6 +127,7 @@ h1 {
   padding: 0.85rem 1rem;
   font-size: 1rem;
   cursor: pointer;
+
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -74,71 +138,135 @@ h1 {
   box-shadow: 0 6px 18px rgba(255, 165, 0, 0.4);
 }
 
-.city-list {
-  columns: 2;
-  column-gap: 1.5rem;
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem;
-  text-align: left;
-}
-
-.city-list li {
-  margin-bottom: 0.6rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: 0.85rem;
-  background: rgba(25, 25, 112, 0.08);
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.city-list li:hover {
-  transform: translateX(2px);
-  box-shadow: 0 4px 12px rgba(25, 25, 112, 0.15);
-}
+/* Result */
 
 .result {
-  background: #f0f4ff;
-  border-radius: 1rem;
   padding: 1rem;
-  margin-top: 1rem;
-  text-align: left;
-  color: #1f2a66;
-  box-shadow: inset 0 0 0 1px rgba(25, 25, 112, 0.08);
+  border-radius: 1rem;
+  margin-top: 0.75rem;
+
+  background:
+    linear-gradient(#ffa500, #ffa500) padding-box,
+    /* bakgrunn */ linear-gradient(#ffa500, #ffa500) border-box; /* venstre strek */
+
+  border-left: 6px solid transparent; /* bredde på streken */
+  border-radius: 1rem;
+  background-clip: padding-box, border-box;
+}
+
+/* .result { */
+/*   background: rgba(255, 255, 255, 0.55); */
+/*   padding: 1rem; */
+/*   border-radius: 1rem; */
+/**/
+/*   /* border-left: 4px solid #ffa500; */
+*/
+/*   margin-top: 0.75rem; */
+/*   font-weight: 500; */
+/*   letter-spacing: -0.01em; */
+/*   position: relative; */
+/*   box-shadow: inset 0 0 0 1px rgba(25, 25, 112, 0.08); */
+/* } */
+
+.result::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  width: 4px;
+  background: #ffa500;
+  border-radius: 1rem;
+  opacity: 0.85;
 }
 
 .result p {
   margin: 0.35rem 0;
 }
 
+/* Sun info */
+
 .sun-info {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 1rem;
   padding: 1rem;
-  margin-top: 1rem;
-  text-align: left;
-  box-shadow: inset 0 0 0 1px rgba(25, 25, 112, 0.08);
+  border-radius: 1rem;
+  margin-top: 0.75rem;
+
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7))
+      padding-box,
+    linear-gradient(#ffa600, #ff4500) border-box;
+
+  border-left: 6px solid transparent;
+  border-radius: 1rem;
+  background-clip: padding-box, border-box;
 }
 
-.countdown {
-  background: #fdfd96;
-  color: #191970;
-  border-radius: 1rem;
-  padding: 1rem;
-  margin: 1.25rem 0 0;
-  font-weight: bold;
-  font-size: 1.1rem;
+/* .sun-info { */
+/*   display: grid; */
+/*   gap: 0.3rem; */
+/*   padding: 0.9rem 1rem; */
+/*   border-radius: 1rem; */
+/**/
+/*   background: rgba(255, 255, 255, 0.7); */
+/*   margin-top: 0.75rem; */
+/*   border: 1px solid rgba(60, 60, 120, 0.15); */
+/*   position: relative; */
+/*   /* box-shadow: inset 0 0 0 1px rgba(25, 25, 112, 0.08); */
+*/
+/* } */
+
+/* .sun-info::before { */
+/*   content: ""; */
+/*   position: absolute; */
+/*   top: 0; */
+/*   left: 0; */
+/*   bottom: 0; */
+/**/
+/*   width: 4px; */
+/*   background: linear-gradient(#ffa600, #ff4500); */
+/*   border-radius: 1rem; */
+/*   opacity: 0.75; */
+/* } */
+
+.sun-info p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.25rem 0;
+
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 400;
+  text-align: left;
+
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
+
+/* Countdown */
+
+.countdown {
+  background: linear-gradient(90deg, #fffbe8, #fff3b0);
+  color: #191970;
+  border-radius: 0.75rem;
+  padding: 0.8rem 1rem;
+  margin: 1.25rem 0 0;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Sun animation */
 
 .sun-container {
   width: 140px;
   height: 140px;
   border-radius: 50%;
+  margin: 2rem auto 0;
+
   background: radial-gradient(circle, #ffcc00 70%, #ff9900 100%);
   box-shadow: 0 0 45px 10px rgba(255, 204, 0, 0.7);
-  margin: 2rem auto 0;
+
   position: relative;
   display: flex;
   align-items: flex-end;
@@ -154,32 +282,34 @@ h1 {
   transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Responsive for small screens  */
+/* Mobile */
+
 @media (max-width: 720px) {
   .card {
-    padding: 1rem 0.5rem; /* mindre padding */
+    padding: 1rem 0.5rem;
   }
+
   h1 {
-    font-size: 1.5rem; /* mindre overskrift */
+    font-size: 1.5rem;
     margin-bottom: 0.5rem;
   }
-  .subtitle {
-    margin: 0.25rem 0 1rem;
-  }
+
   .city-grid,
   .city-list {
     margin-bottom: 1rem;
   }
-  .result,
-  .sun-info,
+
+  /* .result, */
+  /* .sun-info, */
   .countdown {
     padding: 0.5rem;
     margin-top: 0.5rem;
     font-size: 0.95rem;
   }
+
   .sun-container {
     width: 100px;
     height: 100px;
-    margin: 1rem auto 0;
+    margin-top: 1rem;
   }
 }

@@ -164,13 +164,17 @@ const App: React.FC = () => {
             ))}
           </div>
         ) : (
-          <ul className="city-list">
+          <div className="city-grid">
             {cities.map((city, index) => (
-              <li key={city.name} onClick={() => selectCity(index)}>
-                Trykk <strong>{index + 1}</strong> for {city.name}
-              </li>
+              <button
+                key={city.name}
+                className="city-btn"
+                onClick={() => selectCity(index)}
+              >
+                <strong>{index + 1}</strong> · {city.name}
+              </button>
             ))}
-          </ul>
+          </div>
         )}
         {result && (
           <div className="result">

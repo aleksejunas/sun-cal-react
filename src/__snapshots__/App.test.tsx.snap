@@ -1,0 +1,137 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Winter Solstice Calculator matches snapshot 1`] = `
+<div>
+  <div
+    class="main-bg w-[100vw] h-[100vh]"
+  >
+    <div
+      class="card w-[70vw] h- [70vh]"
+    >
+      <h1>
+        Vintersolverv Kalkulator
+      </h1>
+      <p
+        class="timestamp"
+        data-testid="current-date-time"
+      >
+        23.11.2025
+        <span
+          class="dot"
+        >
+           • 
+        </span>
+        20:56:13
+      </p>
+      <p
+        class="subtitle"
+      >
+        Velg en by for å sjekke hvor mye lengre dagen er nå
+      </p>
+      <div
+        class="city-grid"
+      >
+        <button
+          class="city-btn"
+        >
+          <strong>
+            1
+          </strong>
+           · 
+          Oslo
+        </button>
+        <button
+          class="city-btn"
+        >
+          <strong>
+            2
+          </strong>
+           · 
+          Bergen
+        </button>
+        <button
+          class="city-btn"
+        >
+          <strong>
+            3
+          </strong>
+           · 
+          Trondheim
+        </button>
+        <button
+          class="city-btn"
+        >
+          <strong>
+            4
+          </strong>
+           · 
+          Tromsø
+        </button>
+        <button
+          class="city-btn"
+        >
+          <strong>
+            5
+          </strong>
+           · 
+          Stavanger
+        </button>
+        <button
+          class="city-btn"
+        >
+          <strong>
+            6
+          </strong>
+           · 
+          Kristiansand
+        </button>
+        <button
+          class="city-btn"
+        >
+          <strong>
+            7
+          </strong>
+           · 
+          Fredrikstad
+        </button>
+        <button
+          class="city-btn"
+        >
+          <strong>
+            8
+          </strong>
+           · 
+          Longyearbyen
+        </button>
+      </div>
+      <div
+        class="countdown"
+      >
+        Nedtelling til vintersolverv:
+         
+        <span
+          data-testid="solstice-countdown"
+        >
+          27
+          d 
+          3
+          h 
+          3
+          m
+           
+          46
+          s
+        </span>
+      </div>
+      <div
+        class="sun-container"
+      >
+        <div
+          class="sun-light"
+          style="height: 100%;"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;

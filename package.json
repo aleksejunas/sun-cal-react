@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "react-scripts test",
+    "test": "jest",
     "test:coverage": "react-scripts test --coverage --watchAll=false"
   },
   "dependencies": {
@@ -37,6 +37,7 @@
     "extend-expect": "link:@testing-library/jest-dom/extend-expect",
     "globals": "^15.15.0",
     "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.2.0",
     "jest-environment-jsdom": "^29.7.0",
     "msw": "^2.12.3",
     "postcss": "^8.5.6",

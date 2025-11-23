@@ -2,7 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
 
-// TODO: Endre bakgrunn etter tid på døgnet (blå himmel etc.)
+// TODO: Alter background after time of day (Blue sky's etc.)
+// TODO: Add dark mode
+// TODO: Make the application more modular
+// TODO: Move language
+// TODO: Add support for multiple languages utilizing the 'react-i18next' library
 
 type DaylightPreciseResult = {
   daylightHours: number;

@@ -149,7 +149,7 @@ const App: React.FC = () => {
         </p>
 
         <p className="subtitle">
-          Velg en dag for å sjekke hvor mye lengre dagen er nå
+          Velg en by for å sjekke hvor mye lengre dagen er nå
         </p>
         {isTouchDevice ? (
           <div className="city-grid">

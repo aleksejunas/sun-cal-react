@@ -1,5 +1,8 @@
 # Winter Solstice Calculator
 
+Application is live at: [Winter Solstice Calculator](https://winter-solstice-calculator.vercel.app/)
+
+
 Single-page React app that compares today's daylight to the winter solstice for a handful of Norwegian cities. Calculations and sunrise/sunset times come from the local NOAA-based helper, so it works offline without any external API calls.
 
 ## How it works

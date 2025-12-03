@@ -180,17 +180,22 @@ const App: React.FC = () => {
             ))}
           </div>
         )}
-        {result && (
-          <div className="result">
-            {result.split("\n").map((line, idx) => (
-              <p key={`${line}-${idx}`}>{line}</p>
-            ))}
-          </div>
-        )}
-        {preciseTimes && (
-          <div className="sun-info">
-            <p>Sol opp: {preciseTimes.sunrise || "N/A"}</p>
-            <p>Sol ned: {preciseTimes.sunset || "N/A"}</p>
+        {(result || preciseTimes) && (
+          <div className="info-group">
+            {result && (
+              <div className="info-line">
+                {result.split("\n").map((line, idx) => (
+                  <p key={`${line}-${idx}`}>{line}</p>
+                ))}
+              </div>
+            )}
+
+            {preciseTimes && (
+              <div className="info-line">
+                <p>Sol opp: {preciseTimes.sunrise || "N/A"}</p>
+                <p>Sol ned: {preciseTimes.sunset || "N/A"}</p>
+              </div>
+            )}
           </div>
         )}
         <div className="countdown">

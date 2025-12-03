@@ -39,6 +39,7 @@ const App: React.FC = () => {
   });
   const [result, setResult] = useState("");
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -142,71 +143,84 @@ const App: React.FC = () => {
   }, [cities, isTouchDevice, selectCity]);
 
   return (
-    <div className="main-bg w-[100vw] h-[100vh]">
-      <div className="card w-[70vw] h- [70vh]">
-        <h1>Vintersolverv Kalkulator</h1>
-
-        <p className="timestamp" data-testid="current-date-time">
-          {currentTime.toLocaleDateString()}
-          <span className="dot"> • </span>
-          {currentTime.toLocaleTimeString()}
-        </p>
-
-        <p className="subtitle">
-          Velg en by for å sjekke hvor mye lengre dagen er nå
-        </p>
-        {isTouchDevice ? (
-          <div className="city-grid">
-            {cities.map((city, index) => (
-              <button
-                key={city.name}
-                className="city-btn"
-                onClick={() => selectCity(index)}
-              >
-                {city.name}
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="city-grid">
-            {cities.map((city, index) => (
-              <button
-                key={city.name}
-                className="city-btn"
-                onClick={() => selectCity(index)}
-              >
-                <strong>{index + 1}</strong> · {city.name}
-              </button>
-            ))}
-          </div>
-        )}
-        {(result || preciseTimes) && (
-          <div className="info-group">
-            {result && (
-              <div className="info-line">
-                {result.split("\n").map((line, idx) => (
-                  <p key={`${line}-${idx}`}>{line}</p>
-                ))}
-              </div>
-            )}
-
-            {preciseTimes && (
-              <div className="info-line">
-                <p>Sol opp: {preciseTimes.sunrise || "N/A"}</p>
-                <p>Sol ned: {preciseTimes.sunset || "N/A"}</p>
-              </div>
-            )}
-          </div>
-        )}
-        <div className="countdown">
-          Nedtelling til vintersolverv:{" "}
-          <span data-testid="solstice-countdown">
-            {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
-            {countdown.seconds}s
-          </span>
+    <div className={dark ? "dark" : ""}>
+      <div className="main-bg w-[100vw] h-[100vh]">
+        <div
+          role="button"
+          aria-label={dark ? "Bytt til lys modus" : "Bytt til mørk modus"}
+          aria-pressed={dark}
+          onClick={() => setDark(!dark)}
+          className="theme-toggle-btn"
+        >
+          {dark ? "🌛" : "🌞"}
         </div>
-        <div className="sun-container">
-          <div className="sun-light" style={{ height: `${lightHeight}%` }} />
+        <div className="card w-[70vw] h- [70vh]">
+          <h1 className="main-title">
+            <span className="snowflake">❄</span> Vintersolverv Kalkulator{" "}
+          </h1>
+
+          <p className="timestamp" data-testid="current-date-time">
+            {currentTime.toLocaleDateString()}
+            <span className="dot"> • </span>
+            {currentTime.toLocaleTimeString()}
+          </p>
+
+          <p className="subtitle">
+            Velg en by for å sjekke hvor mye lengre dagen er nå
+          </p>
+          {isTouchDevice ? (
+            <div className="city-grid">
+              {cities.map((city, index) => (
+                <button
+                  key={city.name}
+                  className="city-btn"
+                  onClick={() => selectCity(index)}
+                >
+                  {city.name}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="city-grid">
+              {cities.map((city, index) => (
+                <button
+                  key={city.name}
+                  className="city-btn"
+                  onClick={() => selectCity(index)}
+                >
+                  <strong>{index + 1}</strong> · {city.name}
+                </button>
+              ))}
+            </div>
+          )}
+          {(result || preciseTimes) && (
+            <div className="info-group">
+              {result && (
+                <div className="info-line">
+                  {result.split("\n").map((line, idx) => (
+                    <p key={`${line}-${idx}`}>{line}</p>
+                  ))}
+                </div>
+              )}
+
+              {preciseTimes && (
+                <div className="info-line">
+                  <p>Sol opp: {preciseTimes.sunrise || "N/A"}</p>
+                  <p>Sol ned: {preciseTimes.sunset || "N/A"}</p>
+                </div>
+              )}
+            </div>
+          )}
+          <div className="countdown">
+            Nedtelling til vintersolverv:{" "}
+            <span data-testid="solstice-countdown">
+              {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
+              {countdown.seconds}s
+            </span>
+          </div>
+          <div className="sun-container">
+            <div className="sun-light" style={{ height: `${lightHeight}%` }} />
+          </div>
         </div>
       </div>
     </div>

@@ -29,30 +29,30 @@ jest
 describe("Winter Solstice Calculator", () => {
   test("renders the app with title and instructions", () => {
     render(<App />);
-    expect(screen.getByText(/Winter Solstice Calculator/i)).toBeInTheDocument();
+    expect(screen.getByText(/Vintersolverv Kalkulator/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/Choose a city to see how much longer the day is/i),
+      screen.getByText(/Velg en by for å sjekke hvor mye lengre dagen er nå/i),
     ).toBeInTheDocument();
   });
 
   test("shows city list", () => {
     render(<App />);
-    expect(screen.getByText(/Press.*for Oslo/i)).toBeInTheDocument();
-    expect(screen.getByText(/Press.*for Bergen/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Oslo/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Bergen/i })).toBeInTheDocument();
   });
 
   test("selects city and displays results", async () => {
     render(<App />);
 
     // Click on Oslo in the list
-    const osloElement = screen.getByText(/Press.*for Oslo/i);
+    const osloElement = screen.getByRole('button', { name: /Oslo/i });
     fireEvent.click(osloElement);
 
     // Check that results appear
     await waitFor(() => {
-      expect(screen.getByText(/In Oslo, the day is/i)).toBeInTheDocument();
-      expect(screen.getByText(/Sunrise:/i)).toBeInTheDocument();
-      expect(screen.getByText(/Sunset:/i)).toBeInTheDocument();
+      expect(screen.getByText(/Oslo: Dagen er/i)).toBeInTheDocument();
+      expect(screen.getByText(/Sol opp:/i)).toBeInTheDocument();
+      expect(screen.getByText(/Sol ned:/i)).toBeInTheDocument();
     });
   });
 

@@ -1,119 +1,134 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Winter Solstice Calculator matches snapshot 1`] = `
 <div>
   <div
-    class="min-h-screen bg-gray-700 flex flex-col items-center justify-center p-4"
+    class="main-bg w-[100vw] h-[100vh]"
   >
-    <h1
-      class="text-3xl font-bold mb-4"
-    >
-      Winter Solstice Calculator
-    </h1>
     <div
-      class="bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md"
+      class="card w-[70vw] h- [70vh]"
     >
+      <h1>
+        Vintersolverv Kalkulator
+      </h1>
       <p
-        class="mb-4"
+        class="timestamp"
         data-testid="current-date-time"
       >
-        Current day, date, and time: 
-        6/21/2023, 12:00:00 PM
+        23.11.2025
+        <span
+          class="dot"
+        >
+           • 
+        </span>
+        20:56:13
       </p>
       <p
-        class="mb-4"
+        class="subtitle"
       >
-        Choose a city to see how much longer the day is:
+        Velg en by for å sjekke hvor mye lengre dagen er nå
       </p>
-      <ul
-        class="mb-4"
+      <div
+        class="city-grid"
       >
-        <li
-          class="mb-2 cursor-pointer"
+        <button
+          class="city-btn"
         >
-          Press 
           <strong>
             1
           </strong>
-           for 
+           · 
           Oslo
-        </li>
-        <li
-          class="mb-2 cursor-pointer"
+        </button>
+        <button
+          class="city-btn"
         >
-          Press 
           <strong>
             2
           </strong>
-           for 
+           · 
           Bergen
-        </li>
-        <li
-          class="mb-2 cursor-pointer"
+        </button>
+        <button
+          class="city-btn"
         >
-          Press 
           <strong>
             3
           </strong>
-           for 
+           · 
           Trondheim
-        </li>
-        <li
-          class="mb-2 cursor-pointer"
+        </button>
+        <button
+          class="city-btn"
         >
-          Press 
           <strong>
             4
           </strong>
-           for 
+           · 
           Tromsø
-        </li>
-        <li
-          class="mb-2 cursor-pointer"
+        </button>
+        <button
+          class="city-btn"
         >
-          Press 
           <strong>
             5
           </strong>
-           for 
+           · 
           Stavanger
-        </li>
-        <li
-          class="mb-2 cursor-pointer"
+        </button>
+        <button
+          class="city-btn"
         >
-          Press 
           <strong>
             6
           </strong>
-           for 
+           · 
           Kristiansand
-        </li>
-        <li
-          class="mb-2 cursor-pointer"
+        </button>
+        <button
+          class="city-btn"
         >
-          Press 
           <strong>
             7
           </strong>
-           for 
+           · 
           Fredrikstad
-        </li>
-        <li
-          class="mb-2 cursor-pointer"
+        </button>
+        <button
+          class="city-btn"
         >
-          Press 
           <strong>
             8
           </strong>
-           for 
+           · 
           Longyearbyen
-        </li>
-      </ul>
+        </button>
+      </div>
       <div
-        class="sun-container mt-4"
+        class="countdown"
+      >
+        Nedtelling til vintersolverv:
+         
+        <span
+          data-testid="solstice-countdown"
+        >
+          27
+          d 
+          3
+          h 
+          3
+          m
+           
+          46
+          s
+        </span>
+      </div>
+      <div
+        class="sun-container"
       >
         <div
-          class="sun"
+          class="sun-light"
+          style="height: 100%;"
         />
       </div>
     </div>

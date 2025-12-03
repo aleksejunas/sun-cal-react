@@ -2,7 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
 
-// TODO: Endre bakgrunn etter tid på døgnet (blå himmel etc.)
+// TODO: Alter background after time of day (Blue sky's etc.)
+// TODO: Add dark mode
+// TODO: Make the application more modular
+// TODO: Move language
+// TODO: Add support for multiple languages utilizing the 'react-i18next' library
 
 type DaylightPreciseResult = {
   daylightHours: number;
@@ -164,25 +168,34 @@ const App: React.FC = () => {
             ))}
           </div>
         ) : (
-          <ul className="city-list">
+          <div className="city-grid">
             {cities.map((city, index) => (
-              <li key={city.name} onClick={() => selectCity(index)}>
-                Trykk <strong>{index + 1}</strong> for {city.name}
-              </li>
-            ))}
-          </ul>
-        )}
-        {result && (
-          <div className="result">
-            {result.split("\n").map((line, idx) => (
-              <p key={`${line}-${idx}`}>{line}</p>
+              <button
+                key={city.name}
+                className="city-btn"
+                onClick={() => selectCity(index)}
+              >
+                <strong>{index + 1}</strong> · {city.name}
+              </button>
             ))}
           </div>
         )}
-        {preciseTimes && (
-          <div className="sun-info">
-            <p>Sol opp: {preciseTimes.sunrise || "N/A"}</p>
-            <p>Sol ned: {preciseTimes.sunset || "N/A"}</p>
+        {(result || preciseTimes) && (
+          <div className="info-group">
+            {result && (
+              <div className="info-line">
+                {result.split("\n").map((line, idx) => (
+                  <p key={`${line}-${idx}`}>{line}</p>
+                ))}
+              </div>
+            )}
+
+            {preciseTimes && (
+              <div className="info-line">
+                <p>Sol opp: {preciseTimes.sunrise || "N/A"}</p>
+                <p>Sol ned: {preciseTimes.sunset || "N/A"}</p>
+              </div>
+            )}
           </div>
         )}
         <div className="countdown">

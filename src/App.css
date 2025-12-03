@@ -14,9 +14,10 @@ body,
 
 .main-bg {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 2rem 1rem;
+  overflow-y: auto;
 }
 
 .theme-toggle-btn {
@@ -54,6 +55,7 @@ body,
   padding: 2.5rem 2rem;
   width: 100%;
   max-width: 700px;
+  transition: all 0.3s ease-in-out;
 
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   color: #eaf1ff;
@@ -68,6 +70,7 @@ h1 {
   letter-spacing: -0.02em;
   margin-bottom: 1rem;
   color: #dce8ff;
+  transition: all 0.3s ease-in-out;
 }
 
 .main-title {
@@ -87,6 +90,7 @@ h1 {
   font-size: 1rem;
   opacity: 0.9;
   color: #bacaf2;
+  transition: all 0.3s ease-in-out;
 }
 
 /* Timestamp */
@@ -96,6 +100,7 @@ h1 {
   gap: 0.5rem;
   padding: 0.3rem 1rem;
   border-radius: 0.5rem;
+  transition: all 0.3s ease-in-out;
 
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(6px);
@@ -126,9 +131,9 @@ h1 {
   padding: 0.85rem 1rem;
   font-size: 1rem;
   cursor: pointer;
-
-  box-shadow: 0 4px 12px rgva(0, 0, 40, 0.25);
   transition: 0.2s ease;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 40, 0.25);
 }
 
 .city-btn:hover {
@@ -140,10 +145,10 @@ h1 {
   position: relative;
   border-radius: 1rem;
   overflow: hidden;
-  background: linear-gradient(135deg, #203f78, #4f6fe0);
+  background: linear-gradient(135deg, #2e3a87, #4f5bd5);
   color: white;
   margin-bottom: 1.24rem;
-
+  transition: all 0.3s ease-in-out;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
 }
 
@@ -153,15 +158,14 @@ h1 {
   left: 0;
   top: 0;
   bottom: 0;
-
   width: 6px;
-  background: linear-gradient(180deg, #8fbaff, #4e74ff);
+  background: linear-gradient(180deg, #a2baff, #788aff);
+  transition: all 0.3s ease-in-out;
 }
 
 .info-line {
-  padding:
-    1rem,
-    1.25rem 1rem 1.5rem;
+  padding: 1rem 1.25rem 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .info-line:last-child {
@@ -194,6 +198,7 @@ h1 {
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
+  transition: all 0.3s ease-in-out;
 
   border: 1px solid rgba(255, 255, 255, 0.16);
 }
@@ -211,6 +216,7 @@ h1 {
 
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease-in-out;
 }
 
 .sun-light {
@@ -218,39 +224,12 @@ h1 {
   height: 0%;
   background: linear-gradient(180deg, #ffae00 0%, #ffd24c 100%);
   border-radius: 50%;
-  transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 1s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease-in-out;
 }
 
-.info-group {
-  position: relative;
-  border-radius: 1rem;
-  overflow: hidden;
-  background: linear-gradient(135deg, #2e3a87, #4f5bd5);
-  color: white;
-}
 
-.info-group::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background: linear-gradient(180deg, #a2baff, #788aff);
-}
 
-.info-line {
-  padding: 1rem 1.25rem 1rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
 
-.info-line:last-child {
-  border-bottom: none;
-}
-
-.snowflake {
-  font-size: 2rem;
-}
 
 /* Mobile */
 

@@ -144,21 +144,21 @@ const App: React.FC = () => {
 
   return (
     <div className={dark ? "dark" : ""}>
-      <div className="main-bg w-[100vw] h-[100vh]">
-        <div
-          role="button"
-          aria-label={dark ? "Bytt til lys modus" : "Bytt til mørk modus"}
-          aria-pressed={dark}
-          onClick={() => setDark(!dark)}
-          className="theme-toggle-btn"
-        >
-          {dark ? "🌛" : "🌞"}
-        </div>
-        <div className="card w-[70vw] h- [70vh]">
+      <div className="main-bg min-h-screen">
+        <div className="card">
           <h1 className="main-title">
             <span className="snowflake">❄</span> Vintersolverv Kalkulator{" "}
           </h1>
-
+          {/* TODO: Test the header element thing */}
+          <div
+            role="button"
+            aria-label={dark ? "Bytt til lys modus" : "Bytt til mørk modus"}
+            aria-pressed={dark}
+            onClick={() => setDark(!dark)}
+            className="theme-toggle-btn"
+          >
+            {dark ? "🌛" : "🌞"}
+          </div>
           <p className="timestamp" data-testid="current-date-time">
             {currentTime.toLocaleDateString()}
             <span className="dot"> • </span>

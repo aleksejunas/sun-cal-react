@@ -6,6 +6,7 @@
 - [ ] Add a reset button
 - [ ] Make it more modular
 - [ ] Potential themes
+- [ ] Make the App Pure
 
  TODO: Themes: 
 

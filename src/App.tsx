@@ -146,18 +146,21 @@ const App: React.FC = () => {
     <div className={dark ? "dark" : ""}>
       <div className="main-bg min-h-screen">
         <div className="card">
-          <h1 className="main-title">
-            <span className="snowflake">❄</span> Vintersolverv Kalkulator{" "}
-          </h1>
-          {/* TODO: Test the header element thing */}
-          <div
-            role="button"
-            aria-label={dark ? "Bytt til lys modus" : "Bytt til mørk modus"}
-            aria-pressed={dark}
-            onClick={() => setDark(!dark)}
-            className="theme-toggle-btn"
-          >
-            {dark ? "🌛" : "🌞"}
+          <div className="card-header">
+            <div className="header-spacer"></div>
+            <div
+              role="button"
+              aria-label={dark ? "Bytt til lys modus" : "Bytt til mørk modus"}
+              aria-pressed={dark}
+              onClick={() => setDark(!dark)}
+              className="theme-toggle-btn"
+            >
+              {dark ? "🌛" : "🌞"}
+            </div>
+
+            <h1 className="main-title">
+              Vintersolverv Kalkulator <span className="snowflake">❄</span>
+            </h1>
           </div>
           <p className="timestamp" data-testid="current-date-time">
             {currentTime.toLocaleDateString()}

@@ -16,3 +16,16 @@
 2) 🔮 **Aurora Gradient** - (Blå → purple → turkis, litt mer moderne, mer WOW)
 
 3) ⚪ **Minimal White** + Blue accents - (HVITT UI med blå akenter, ren og enkel)
+
+- unødvendige useEffect
+- dupliserte beregninger
+- gjøre daylight-beregningene mer pure
+- lage separate komponenter
+- legge tailwind på alle gradientene
+
+Hvis du vil kan jeg:
+
+✔ Lage hele util-filen for deg
+✔ Lage en fullstendig refaktorert App.tsx som bruker de pure funksjonene
+✔ Lage Jest-testene for alle beregningene
+✔ Legge inn en test som sjekker at solstice-countdown er riktig

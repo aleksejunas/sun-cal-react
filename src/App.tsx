@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
+import { getSolsticeCountdown } from "./utils/getSolsticeCountdown";
+import { getDaylightDifference } from "./utils/daylightDifference";
 
 // TODO: Alter background after time of day (Blue sky's etc.)
 // TODO: Add dark mode
@@ -43,6 +45,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
+    const now = new Date();
+    setCountdown(getSolsticeCountdown(now));
     return () => clearInterval(interval);
   }, []);
 
@@ -98,34 +102,42 @@ const App: React.FC = () => {
   );
 
   const selectCity = useCallback(
-    async (index: number) => {
+    (index: number) => {
       const city = cities[index];
-      const now = new Date();
-      const winterPrecise = calculateDaylightPrecise(
-        2024,
-        12,
-        21,
-        city.latitude,
-      );
-      const currentPrecise = calculateDaylightPrecise(
-        now.getFullYear(),
-        now.getMonth() + 1,
-        now.getDate(),
+      const now = currentTime;
+
+      // Winter solstice-day
+      // const winter = calculateDaylightPrecise(
+      //   now.getFullYear(),
+      //   12,
+      //   21,
+      //   city.latitude,
+      // );
+
+      // The length of today
+      // const today = calculateDaylightPrecise(
+      //   now.getFullYear(),
+      //   now.getMonth() + 1,
+      //   now.getDate(),
+      //   city.latitude,
+      // );
+
+      const { today, diff, diffHours, diffMinutes } = getDaylightDifference(
+        now,
         city.latitude,
       );
 
-      const diffPrecise =
-        currentPrecise.daylightHours - winterPrecise.daylightHours;
-      const hoursPrecise = Math.floor(diffPrecise);
-      const minutesPrecise = Math.round((diffPrecise - hoursPrecise) * 60);
-
+      // Result string
       setResult(
-        `${city.name}: Dagen er (${hoursPrecise}h ${minutesPrecise}m)` +
-          ` ${diffPrecise.toFixed(2)} timer  lengre enn ved vintersolverv`,
+        `${city.name}: Dagen er (${diffHours}h ${diffMinutes}m) ${diff.toFixed(
+          2,
+        )} timer lengre enn ved vintersolverv`,
       );
-      setPreciseTimes(currentPrecise);
+
+      // Sunrise / sunset
+      setPreciseTimes(today);
     },
-    [cities],
+    [cities, currentTime],
   );
 
   useEffect(() => {

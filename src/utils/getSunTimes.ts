@@ -1,6 +1,6 @@
 import SunCalc from "suncalc";
 
-type SunTimesResult = {
+export type SunTimesResult = {
   sunrise: string;
   sunset: string;
   solarNoon: string;

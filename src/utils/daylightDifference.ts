@@ -1,22 +1,5 @@
 import getSunTimes from "./getSunTimes";
 
-type SunTimesResult = {
-  sunrise: string;
-  sunset: string;
-  solarNoon: string;
-  nadir: string;
-  sunriseEnd: string;
-  sunsetStart: string;
-  dawn: string;
-  dusk: string;
-  nauticalDawn: string;
-  nauticalDusk: string;
-  nightEnd: string;
-  night: string;
-  goldenHourEnd: string;
-  goldenHour: string;
-};
-
 export function getDaylightDifference(
   date: Date,
   latitude: number,

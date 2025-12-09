@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
-import calculateDaylightPrecise from "./utils/calculateDaylightPrecise";
 import { getSolsticeCountdown } from "./utils/getSolsticeCountdown";
 import { getDaylightDifference } from "./utils/daylightDifference";
 
@@ -10,8 +9,7 @@ import { getDaylightDifference } from "./utils/daylightDifference";
 // TODO: Move language
 // TODO: Add support for multiple languages utilizing the 'react-i18next' library
 
-type DaylightPreciseResult = {
-  daylightHours: number;
+type SunTimesResult = {
   sunrise: string;
   sunset: string;
 };
@@ -19,12 +17,14 @@ type DaylightPreciseResult = {
 type City = {
   name: string;
   latitude: number;
+  longitude: number;
 };
 
 const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [preciseTimes, setPreciseTimes] =
-    useState<DaylightPreciseResult | null>(null);
+  const [preciseTimes, setPreciseTimes] = useState<SunTimesResult | null>(
+    null,
+  );
   const [countdown, setCountdown] = useState({
     days: 0,
     hours: 0,
@@ -89,14 +89,14 @@ const App: React.FC = () => {
 
   const cities = useMemo<City[]>(
     () => [
-      { name: "Oslo", latitude: 59.9139 },
-      { name: "Bergen", latitude: 60.3913 },
-      { name: "Trondheim", latitude: 63.4305 },
-      { name: "Tromsø", latitude: 69.6496 },
-      { name: "Stavanger", latitude: 58.9699 },
-      { name: "Kristiansand", latitude: 58.0848 },
-      { name: "Fredrikstad", latitude: 59.135 },
-      { name: "Longyearbyen", latitude: 78.2167 },
+      { name: "Oslo", latitude: 59.9139, longitude: 10.757933 },
+      { name: "Bergen", latitude: 60.3913, longitude: 5.32415 },
+      { name: "Trondheim", latitude: 63.4305, longitude: 10.39506 },
+      { name: "Tromsø", latitude: 69.6496, longitude: 18.95508 },
+      { name: "Stavanger", latitude: 58.9699, longitude: 5.73332 },
+      { name: "Kristiansand", latitude: 58.0848, longitude: 7.9956 },
+      { name: "Fredrikstad", latitude: 59.135, longitude: 10.9298 },
+      { name: "Longyearbyen", latitude: 78.2167, longitude: 15.64689 },
     ],
     [],
   );
@@ -125,6 +125,7 @@ const App: React.FC = () => {
       const { today, diff, diffHours, diffMinutes } = getDaylightDifference(
         now,
         city.latitude,
+        city.longitude,
       );
 
       // Result string
@@ -135,7 +136,7 @@ const App: React.FC = () => {
       );
 
       // Sunrise / sunset
-      setPreciseTimes(today);
+      setPreciseTimes({ sunrise: today.sunrise, sunset: today.sunset });
     },
     [cities, currentTime],
   );

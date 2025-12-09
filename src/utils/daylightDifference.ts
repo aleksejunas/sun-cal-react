@@ -1,33 +1,63 @@
-/* ****
- * utils/daylightDifference.14:43:33
- *
- * - Takes in a date and latitude,
- * - Calculates the length of the current day
- * - Calculates the length of the winter-solstice day
- * - Calculates the diff in hours and minutes
- *
- ***** */
+import getSunTimes from "./getSunTimes";
 
-import calculateDaylightPrecise from "./calculateDaylightPrecise";
+type SunTimesResult = {
+  sunrise: string;
+  sunset: string;
+  solarNoon: string;
+  nadir: string;
+  sunriseEnd: string;
+  sunsetStart: string;
+  dawn: string;
+  dusk: string;
+  nauticalDawn: string;
+  nauticalDusk: string;
+  nightEnd: string;
+  night: string;
+  goldenHourEnd: string;
+  goldenHour: string;
+};
 
-export function getDaylightDifference(date: Date, latitude: number) {
-  const winter = calculateDaylightPrecise(date.getFullYear(), 12, 21, latitude);
+export function getDaylightDifference(
+  date: Date,
+  latitude: number,
+  longitude: number,
+) {
+  const winterSolsticeDate = new Date(date.getFullYear(), 11, 21); // December 21st
+  const winterTimes = getSunTimes(winterSolsticeDate, latitude, longitude);
 
-  const today = calculateDaylightPrecise(
-    date.getFullYear(),
-    date.getMonth() + 1,
-    date.getDate(),
-    latitude,
-  );
+  const todayTimes = getSunTimes(date, latitude, longitude);
 
-  const diff = today.daylightHours - winter.daylightHours;
+  const parseTime = (timeString: string, baseDate: Date): Date => {
+    const [hours, minutes] = timeString.split(":").map(Number);
+    const newDate = new Date(baseDate);
+    newDate.setHours(hours, minutes, 0, 0);
+    return newDate;
+  };
 
-  // const h = Math.floor(diff);
-  // const m = Math.round((diff - h) * 60);
+  const winterSunrise = parseTime(winterTimes.sunrise, winterSolsticeDate);
+  const winterSunset = parseTime(winterTimes.sunset, winterSolsticeDate);
+  const todaySunrise = parseTime(todayTimes.sunrise, date);
+  const todaySunset = parseTime(todayTimes.sunset, date);
+
+  const winterDaylightMs = winterSunset.getTime() - winterSunrise.getTime();
+  const todayDaylightMs = todaySunset.getTime() - todaySunrise.getTime();
+
+  const winterDaylightHours = winterDaylightMs / (1000 * 60 * 60);
+  const todayDaylightHours = todayDaylightMs / (1000 * 60 * 60);
+
+  const diff = todayDaylightHours - winterDaylightHours;
 
   return {
-    winter,
-    today,
+    winter: {
+      sunrise: winterTimes.sunrise,
+      sunset: winterTimes.sunset,
+      daylightHours: winterDaylightHours,
+    },
+    today: {
+      sunrise: todayTimes.sunrise,
+      sunset: todayTimes.sunset,
+      daylightHours: todayDaylightHours,
+    },
     diff,
     diffHours: Math.floor(diff),
     diffMinutes: Math.round((diff - Math.floor(diff)) * 60),

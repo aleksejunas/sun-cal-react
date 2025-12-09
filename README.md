@@ -2,8 +2,7 @@
 
 Application is live at: [Winter Solstice Calculator](https://winter-solstice-calculator.vercel.app/)
 
-
-Single-page React app that compares today's daylight to the winter solstice for a handful of Norwegian cities. Calculations and sunrise/sunset times come from the local NOAA-based helper, so it works offline without any external API calls.
+Single-page React app that compares today's daylight to the winter solstice for a handful of Norwegian cities. Sunrise/sunset times are calculated with the excellent `suncalc` library for high precision.
 
 ## How it works
 - Pick a city with the number keys (1–8) or tap the buttons on touch devices.
@@ -20,5 +19,5 @@ pnpm test   # run tests
 
 ## Notes
 - City list and UI live in `src/App.tsx`.
-- Daylight math is in `src/utils/calculateDaylightPrecise.ts`.
-- The daylight math uses a standard NOAA-based formula; I didn’t invent it, but I verified it locally and rely on it for sunrise/sunset as well.
+- Daylight math is handled by `src/utils/getSunTimes.ts` and `src/utils/daylightDifference.ts`.
+- The calculations rely on the `suncalc` library to provide high-accuracy solar positioning and timing, which corrects for factors like the Equation of Time.

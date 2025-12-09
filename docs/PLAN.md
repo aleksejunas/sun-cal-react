@@ -8,6 +8,7 @@
 - [ ] Potential themes
 - [ ] Make the App Pure
 
+
  TODO: Themes: 
 
 0) ❄ Arctic / **Nordic** - (Kald blå + hvit tekst + glassmorpism — matcher det du har startet på)

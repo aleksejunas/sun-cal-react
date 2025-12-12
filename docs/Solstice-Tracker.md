@@ -1,4 +1,4 @@
-# Winter Solstice Calculator
+# Solstice Tracker
 
 Short notes on what the app does and how to use it.
 

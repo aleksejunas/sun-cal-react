@@ -172,7 +172,7 @@ const App: React.FC = () => {
             </div>
 
             <h1 className="main-title">
-              Vintersolverv Kalkulator <span className="snowflake">❄</span>
+              Solstice Tracker <span className="snowflake">☀️</span>
             </h1>
           </div>
           <p className="timestamp" data-testid="current-date-time">

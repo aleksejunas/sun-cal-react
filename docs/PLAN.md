@@ -1,4 +1,4 @@
-# Winter Solstice Calculator (Suncal) Dev Plan
+# Solstice Tracker Dev Plan
 
 ## Todos
 - [x] Better styling
@@ -7,7 +7,7 @@
 - [ ] Make it more modular
 - [ ] Potential themes
 - [ ] Make the App Pure
-
+- [ ] Add countdown to summer solstice
 
  TODO: Themes: 
 

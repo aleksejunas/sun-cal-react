@@ -22,9 +22,7 @@ type City = {
 
 const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [preciseTimes, setPreciseTimes] = useState<SunTimesResult | null>(
-    null,
-  );
+  const [preciseTimes, setPreciseTimes] = useState<SunTimesResult | null>(null);
   const [countdown, setCountdown] = useState({
     days: 0,
     hours: 0,
@@ -170,9 +168,9 @@ const App: React.FC = () => {
             >
               {dark ? "🌛" : "🌞"}
             </div>
-
+            {/* TODO: Make sun/snowflake dynamic based on season */}
             <h1 className="main-title">
-              Solstice Tracker <span className="snowflake">☀️</span>
+              Solstice Tracker <span className="snowflake">❄</span>
             </h1>
           </div>
           <p className="timestamp" data-testid="current-date-time">

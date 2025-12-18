@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 import { getSolsticeCountdown } from "./utils/getSolsticeCountdown";
 import { getDaylightDifference } from "./utils/daylightDifference";
+import { getSeasonInfo } from "./utils/getSeasonInfo";
 
 // TODO: Alter background after time of day (Blue sky's etc.)
 // TODO: Add dark mode
@@ -27,7 +28,7 @@ const App: React.FC = () => {
     days: 0,
     hours: 0,
     minutes: 0,
-    seconds: 9,
+    seconds: 0,
   });
   const [lightHeight, setLightHeight] = useState(() => {
     const now = new Date();
@@ -40,33 +41,29 @@ const App: React.FC = () => {
   const [result, setResult] = useState("");
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [dark, setDark] = useState(true);
+  const [seasonInfo, setSeasonInfo] = useState(() => getSeasonInfo(new Date()));
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
-    const now = new Date();
-    setCountdown(getSolsticeCountdown(now));
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const updateSeason = () => setSeasonInfo(getSeasonInfo(new Date()));
+    updateSeason();
+    const interval = setInterval(updateSeason, 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const updateCountdown = () => {
       const now = new Date();
-      const solstice = new Date(now.getFullYear(), 11, 21, 0, 0, 0);
-      const target =
-        now > solstice ? new Date(now.getFullYear() + 1, 11, 21) : solstice;
-      const diff = target.getTime() - now.getTime();
-      setCountdown({
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((diff / (1000 * 60)) % 60),
-        seconds: Math.floor((diff / 1000) % 60),
-      });
+      setCountdown(getSolsticeCountdown(now, seasonInfo.nextSolstice));
     };
-
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [seasonInfo.nextSolstice]);
 
   useEffect(() => {
     const updateLightHeight = () => {
@@ -77,7 +74,6 @@ const App: React.FC = () => {
       const current = (now.getTime() - start.getTime()) / 86400000;
       setLightHeight(Math.min((current / total) * 100, 100));
     };
-
     updateLightHeight();
   }, []);
 
@@ -104,36 +100,18 @@ const App: React.FC = () => {
       const city = cities[index];
       const now = currentTime;
 
-      // Winter solstice-day
-      // const winter = calculateDaylightPrecise(
-      //   now.getFullYear(),
-      //   12,
-      //   21,
-      //   city.latitude,
-      // );
-
-      // The length of today
-      // const today = calculateDaylightPrecise(
-      //   now.getFullYear(),
-      //   now.getMonth() + 1,
-      //   now.getDate(),
-      //   city.latitude,
-      // );
-
       const { today, diff, diffHours, diffMinutes } = getDaylightDifference(
         now,
         city.latitude,
         city.longitude,
       );
 
-      // Result string
       setResult(
         `${city.name}: Dagen er (${diffHours}h ${diffMinutes}m) ${diff.toFixed(
           2,
         )} timer lengre enn ved vintersolverv`,
       );
 
-      // Sunrise / sunset
       setPreciseTimes({ sunrise: today.sunrise, sunset: today.sunset });
     },
     [cities, currentTime],
@@ -153,8 +131,17 @@ const App: React.FC = () => {
     return () => window.removeEventListener("keypress", handler);
   }, [cities, isTouchDevice, selectCity]);
 
+  // Theme class logic
+  const themeClass = dark
+    ? seasonInfo.label === "sommersolverv"
+      ? "summer-dark"
+      : "dark"
+    : seasonInfo.label === "sommersolverv"
+      ? "summer"
+      : "";
+
   return (
-    <div className={dark ? "dark" : ""}>
+    <div className={themeClass}>
       <div className="main-bg min-h-screen">
         <div className="card">
           <div className="card-header">
@@ -168,9 +155,11 @@ const App: React.FC = () => {
             >
               {dark ? "🌛" : "🌞"}
             </div>
-            {/* TODO: Make sun/snowflake dynamic based on season */}
             <h1 className="main-title">
-              Solstice Tracker <span className="snowflake">❄</span>
+              Solstice Tracker{" "}
+              <span className="snowflake">
+                {seasonInfo.label === "sommersolverv" ? "☀️" : "❄"}
+              </span>
             </h1>
           </div>
           <p className="timestamp" data-testid="current-date-time">
@@ -226,7 +215,7 @@ const App: React.FC = () => {
             </div>
           )}
           <div className="countdown">
-            Nedtelling til vintersolverv:{" "}
+            Nedtelling til {seasonInfo.label}:{" "}
             <span data-testid="solstice-countdown">
               {countdown.days}d {countdown.hours}h {countdown.minutes}m{" "}
               {countdown.seconds}s

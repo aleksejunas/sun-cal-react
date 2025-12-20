@@ -36,11 +36,23 @@ body,
   /* transform: translateY(-13px); */
   /* transform: translateX(-45px); */
   transform: translateY(-9px) translateX(-14px) scale(1.3) scaleX(-1);
-  filter: grayscale(100%);
+  /* filter: grayscale(100%); */
 }
 
 .theme-toggle-btn:hover {
   background: rgba(255, 255, 255, 0.14);
+}
+
+/* Grayscale theme toggle button in winter mode */
+.dark .theme-toggle-btn,
+.theme-toggle-btn {
+  filter: grayscale(100%);
+}
+
+/* Color theme toggle button in summer mode */
+.summer .theme-toggle-btn,
+.summer-dark .theme-toggle-btn {
+  filter: none;
 }
 
 .theme-toggle-btn:focus-visible {
@@ -97,7 +109,7 @@ h1 {
 }
 
 .main-title .snowflake {
-  font-size: 3.5rem;
+  font-size: 2.5rem;
 }
 
 .subtitle {
@@ -120,7 +132,7 @@ h1 {
 
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(6px);
-  color: #dce8ff;
+  color: #000;
   font-weight: 600;
   font-size: 0.95rem;
   border: 1px solid rgba(255, 255, 255, 0.18);

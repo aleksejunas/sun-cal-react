@@ -29,7 +29,7 @@ import { getSeasonInfo } from "./utils/getSeasonInfo";
 
 // --- To test AFTER winter solstice (e.g., Dec 22) ---
 class MockDate extends Date {
-  constructor(...args: ConstructorParameters<typeof Date>) {
+  constructor(...args: [] | ConstructorParameters<typeof Date>) {
     super(
       ...((args.length === 0
         ? ["2025-12-22T12:00:00Z"]

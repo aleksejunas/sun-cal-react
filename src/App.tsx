@@ -98,8 +98,43 @@ const App: React.FC = () => {
   });
   const [result, setResult] = useState("");
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState<boolean>(() => {
+    const stored = localStorage.getItem("theme-dark");
+    if (stored !== null) return stored === "true";
+    // Default to dark, but check system preference
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+      return true;
+    }
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: light)").matches
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  const [showThemePrompt, setShowThemePrompt] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme-dark");
+    if (
+      stored === null &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: light)").matches
+    ) {
+      setShowThemePrompt(true);
+    }
+  }, []);
+
   const [seasonInfo, setSeasonInfo] = useState(() => getSeasonInfo(new Date()));
+
+  useEffect(() => {
+    localStorage.setItem("theme-dark", dark.toString());
+  }, [dark]);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -201,6 +236,76 @@ const App: React.FC = () => {
   return (
     <div className={themeClass}>
       <div className="main-bg min-h-screen">
+        {showThemePrompt && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              background: "rgba(0,0,0,0.55",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+            }}
+          >
+            <div
+              style={{
+                background: "#222",
+                color: "#fff",
+                padding: "2rem",
+                borderRadius: "1.5rem",
+                // margin: "1rem auto",
+                maxWidth: 400,
+                width: "90%",
+                textAlign: "center",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+              }}
+            >
+              <p style={{ marginBottom: "1rem" }}>
+                Ser at du bruker lyst systemtema. Vil du prøve vårt mørke tema?
+                Det ser best ut!
+              </p>
+              <button
+                style={{
+                  margin: "0.5rem",
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "0.75rem",
+                  border: "none",
+                  background: "#444",
+                  color: "#fff",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  setDark(true);
+                  setShowThemePrompt(false);
+                }}
+              >
+                Ja, bruk mørkt tema
+              </button>
+              <button
+                style={{
+                  margin: "0.5rem",
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "0.75rem",
+                  border: "none",
+                  background: "#eee",
+                  color: "#222",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  setDark(false);
+                  setShowThemePrompt(false);
+                }}
+              >
+                Nei takk, hold lyst tema
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="card">
           <div className="card-header">
             <div className="header-spacer"></div>

@@ -7,6 +7,7 @@
 - [x] Add countdown to summer solstice
 - [x] Add theme persistence using localstorage 
 - [x] Create a user dialog on first visit, and if the user has chosen light theme, ask if the user wants to use the preferred dark theme which looks better or to keep the light theme
+- [] Clean up in the Mock date code
 - [] Add a reset button
 - [] Make it more modular
 - [] Potential themes

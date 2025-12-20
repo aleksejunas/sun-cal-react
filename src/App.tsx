@@ -237,47 +237,14 @@ const App: React.FC = () => {
     <div className={themeClass}>
       <div className="main-bg min-h-screen">
         {showThemePrompt && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              background: "rgba(0,0,0,0.55",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 9999,
-            }}
-          >
-            <div
-              style={{
-                background: "#222",
-                color: "#fff",
-                padding: "2rem",
-                borderRadius: "1.5rem",
-                // margin: "1rem auto",
-                maxWidth: 400,
-                width: "90%",
-                textAlign: "center",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-              }}
-            >
-              <p style={{ marginBottom: "1rem" }}>
+          <div className="theme-prompt-overlay">
+            <div className="theme-prompt-box">
+              <p>
                 Ser at du bruker lyst systemtema. Vil du prøve vårt mørke tema?
                 Det ser best ut!
               </p>
               <button
-                style={{
-                  margin: "0.5rem",
-                  padding: "0.75rem 1.5rem",
-                  borderRadius: "0.75rem",
-                  border: "none",
-                  background: "#444",
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
+                className="theme-prompt-button-dark"
                 onClick={() => {
                   setDark(true);
                   setShowThemePrompt(false);
@@ -286,15 +253,7 @@ const App: React.FC = () => {
                 Ja, bruk mørkt tema
               </button>
               <button
-                style={{
-                  margin: "0.5rem",
-                  padding: "0.75rem 1.5rem",
-                  borderRadius: "0.75rem",
-                  border: "none",
-                  background: "#eee",
-                  color: "#222",
-                  cursor: "pointer",
-                }}
+                className="theme-prompt-button-light"
                 onClick={() => {
                   setDark(false);
                   setShowThemePrompt(false);

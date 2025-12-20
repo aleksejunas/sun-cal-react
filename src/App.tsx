@@ -144,7 +144,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const updateSeason = () => setSeasonInfo(getSeasonInfo(new Date()));
     updateSeason();
-    const interval = setInterval(updateSeason, 60 * 1000);
+    const interval = setInterval(updateSeason, 1000);
     return () => clearInterval(interval);
   }, []);
 

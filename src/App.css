@@ -132,7 +132,7 @@ h1 {
 
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(6px);
-  color: #000;
+  color: #222;
   font-weight: 600;
   font-size: 0.95rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -302,7 +302,7 @@ h1 {
   opacity: 0.9;
 }
 
-/* Timestamp */
+/* Dark Timestamp */
 .dark .timestamp {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -366,7 +366,7 @@ h1 {
 }
 
 .summer .card {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(235, 235, 255, 0.45);
   color: #2a3a4d;
   box-shadow: 0 8px 24px rgba(200, 220, 255, 0.25);
 }

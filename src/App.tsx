@@ -28,19 +28,45 @@ import { getSeasonInfo } from "./utils/getSeasonInfo";
 // window.Date = MockDate as unknown as DateConstructor;
 
 // --- To test AFTER winter solstice (e.g., Dec 22) ---
-class MockDate extends Date {
-  constructor(...args: [] | ConstructorParameters<typeof Date>) {
-    super(
-      ...((args.length === 0
-        ? ["2025-12-22T12:00:00Z"]
-        : args) as ConstructorParameters<typeof Date>),
-    );
-  }
-  static now() {
-    return new Date("2025-12-22T12:00:00Z").getTime();
-  }
-}
-window.Date = MockDate as unknown as DateConstructor;
+// class MockDate extends Date {
+//   constructor(...args: [] | ConstructorParameters<typeof Date>) {
+//     super(
+//       ...((args.length === 0
+//         ? ["2025-12-22T12:00:00Z"]
+//         : args) as ConstructorParameters<typeof Date>),
+//     );
+//   }
+//   static now() {
+//     return new Date("2025-12-22T12:00:00Z").getTime();
+//   }
+// }
+// window.Date = MockDate as unknown as DateConstructor;
+
+// ----- Ticking MockDate: advances time in real seconds from a fixed start maxTouchPoints
+
+// const REAL_Date = Date;
+// const REAL_Date_now = Date.now;
+//
+// const MOCK_START_ISO = "2025-12-22T12:00:00Z";
+// const MOCK_START_REAL = REAL_Date.now();
+// const MOCK_START_TIME = new Date(MOCK_START_ISO).getTime();
+//
+// class TickingMockDate extends Date {
+//   constructor(...args: [] | ConstructorParameters<typeof Date>) {
+//     if (args.length === 0) {
+//       // Advance mock time by real elapsed ms since load
+//       super(MOCK_START_TIME + (REAL_Date_now() - MOCK_START_REAL));
+//     } else {
+//       super(...args);
+//     }
+//   }
+//   static now() {
+//     return MOCK_START_TIME + (Date.now() - MOCK_START_REAL);
+//   }
+// }
+// window.Date = TickingMockDate as unknown as DateConstructor;
+// // @ts-expect-error: Overriding Date.now with mock implementation
+// Date.no = TickingMockDate.now as unknown as () => number;
 
 type SunTimesResult = {
   sunrise: string;

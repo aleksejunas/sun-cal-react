@@ -10,6 +10,38 @@ import { getSeasonInfo } from "./utils/getSeasonInfo";
 // TODO: Move language
 // TODO: Add support for multiple languages utilizing the 'react-i18next' library
 
+// DEV ONLY: Mock the current date for testing
+// Uncomment one of the following blocks as needed:
+
+// --- To test BEFORE winter solstice (e.g., Dec 20) ---
+// class MockDate extends Date {
+//   constructor(...args: ConstructorParameters<typeof Date>) {
+//     if (args.length === 0) {
+//       super("2025-12-20T12:00:00Z");
+//     }
+//     return new Date(...args);
+//   }
+//   static now() {
+//     return new Date("2025-12-20T12:00:00Z").getTime();
+//   }
+// }
+// window.Date = MockDate as unknown as DateConstructor;
+
+// --- To test AFTER winter solstice (e.g., Dec 22) ---
+class MockDate extends Date {
+  constructor(...args: ConstructorParameters<typeof Date>) {
+    super(
+      ...((args.length === 0
+        ? ["2025-12-22T12:00:00Z"]
+        : args) as ConstructorParameters<typeof Date>),
+    );
+  }
+  static now() {
+    return new Date("2025-12-22T12:00:00Z").getTime();
+  }
+}
+window.Date = MockDate as unknown as DateConstructor;
+
 type SunTimesResult = {
   sunrise: string;
   sunset: string;

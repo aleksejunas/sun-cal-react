@@ -344,3 +344,87 @@ h1 {
 .dark .sun-light {
   background: linear-gradient(180deg, #d98600, #ffb93c);
 }
+
+/* ===== SUMMER LIGHT THEME ===== */
+
+.summer body,
+.summer .main-bg {
+  background: liear-gradient(135deg, #e3f6ff, #f9f7d9);
+  color: #2a3a4d;
+}
+
+.summer .card {
+  background: rgba(255, 255, 255, 0.85);
+  color: #2a3a4d;
+  box-shadow: 0 8px 24px rgba(200, 220, 255, 0.25);
+}
+
+.summer h1,
+.summer .subtitle {
+  color: #2a3a4d;
+}
+.summer .city-btn {
+  background: linear-gradient(135deg, #b2eaff, #ffe9a7);
+  color: #2a3a4d;
+}
+
+.summer .info-group {
+  background: linear-gradient(135deg, #f7f9e3, #e3f6ff);
+  color: #2a3a4d;
+}
+
+.summer .countdown {
+  background: rgba(255, 255, 255, 0.7);
+  color: #2a3a4d;
+}
+
+.summer .sun-container {
+  background: radial-gradient(circle, #fffbe0 55%, #ffe9a7 100%);
+  box-shadow: 0 0 45px 12px rgba(255, 245, 120, 0.5);
+}
+
+.summer .sun-light {
+  background: linear-gradient(180deg, #ffe066, #fffbe0);
+}
+
+/* ===== SUMMER DARK THEME ===== */
+.summer-dark body,
+.summer-dark .main-bg {
+  background: linear-gradient(135deg, #1e2a3a, #3a4d5c);
+  color: #f7f9e3;
+}
+
+.summer-dark .card {
+  background: rgba(255, 255, 255, 0.09);
+  color: #f7f9e3;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.summer-dark h1,
+.summer-dark .subtitle {
+  color: #ffe066;
+}
+
+.summer-dark .city-btn {
+  background: linear-gradient(135deg, #3a4d5c, #ffe066);
+  color: #1e2a3a;
+}
+
+.summer-dark .info-group {
+  background: linear-gradient(135deg, #2a3a4d, #3a4d5c);
+  color: #ffe066;
+}
+
+.summer-dark .countdown {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffe066;
+}
+
+.summer-dark .sun-container {
+  background: radial-gradient(circle, #ffe066 55%, #3a4d5c 100%);
+  box-shadow: 0 0 45px 12px rgba(255, 245, 120, 0.25);
+}
+
+.summer-dark .sun-light {
+  background: linear-gradient(180deg, #ffe066, #3a4d5c);
+}

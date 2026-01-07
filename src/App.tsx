@@ -3,7 +3,7 @@ import "./App.css";
 import { getSolsticeCountdown } from "./utils/getSolsticeCountdown";
 import { getDaylightDifference } from "./utils/daylightDifference";
 import { getSeasonInfo } from "./utils/getSeasonInfo";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 // TODO: Alter background after time of day (Blue sky's etc.)
 // TODO: Add dark mode
